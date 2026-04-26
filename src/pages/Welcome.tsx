@@ -239,7 +239,7 @@ export default function Welcome() {
                     <div className="mb-8 grid grid-cols-1 gap-8 sm:mb-12 sm:grid-cols-2 sm:gap-12 md:grid-cols-4">
                         <div className="md:col-span-2">
                             <h3 className="mb-3 text-xl font-medium tracking-[0.15em] uppercase sm:mb-4 sm:text-2xl">Let's Booth It</h3>
-                            <p className="max-w-sm text-sm leading-relaxed text-[#EDEDEC]/70 sm:text-base">Premium photobooth experiences for your most memorable moments. Creating joy, one snapshot at a time.</p>
+                            <p className="max-w-sm text-sm leading-relaxed text-[#EDEDEC]/70 sm:text-base">Where every click becomes a memory, and every pose is a celebration. Elevate your event with our photobooth, making moments unforgettable, one snapshot at a time!</p>
                         </div>
                         <div>
                             <h4 className="mb-4 text-xs tracking-[0.2em] text-[#EDEDEC]/50 uppercase sm:mb-6">Quick Links</h4>
