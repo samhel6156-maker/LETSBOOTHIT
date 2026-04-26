@@ -12,7 +12,6 @@ app.get("/", (req, res) => {
   res.send("Backend is working");
 });
 
-// ✅ Fixed transporter - no auth for Mailpit
 const transporter = nodemailer.createTransport({
   host: '127.0.0.1',
   port: 1025,
@@ -27,14 +26,13 @@ app.post("/api/booking", async (req, res) => {
   const {
     first_name, last_name, middle_initial, suffix,
     email, phone, event_date, event_location,
-    booth_type, package: pkg, payment_method,
+    package: pkg, payment_method,
   } = req.body;
 
-  if (!first_name || !last_name || !email || !event_date || !event_location || !booth_type || !pkg || !payment_method) {
+  if (!first_name || !last_name || !email || !event_date || !event_location || !pkg || !payment_method) {
     return res.status(400).json({ errors: { general: "Missing required fields." } });
   }
 
-  // ✅ Fixed middle initial formatting
   const middleInitial = middle_initial
     ? middle_initial.replace('.', '') + '.'
     : null;
@@ -62,7 +60,6 @@ app.post("/api/booking", async (req, res) => {
             <h3>Booking Summary</h3>
             <p><strong>Event Date:</strong> ${formattedDate}</p>
             <p><strong>Location:</strong> ${event_location}</p>
-            <p><strong>Booth Type:</strong> ${booth_type}</p>
             <p><strong>Package:</strong> ${pkg}</p>
             <p><strong>Payment Method:</strong> ${payment_method}</p>
             ${phone ? `<p><strong>Phone:</strong> ${phone}</p>` : ''}
@@ -88,7 +85,6 @@ app.post("/api/booking", async (req, res) => {
             <h3>Booking Details</h3>
             <p><strong>Event Date:</strong> ${formattedDate}</p>
             <p><strong>Location:</strong> ${event_location}</p>
-            <p><strong>Booth Type:</strong> ${booth_type}</p>
             <p><strong>Package:</strong> ${pkg}</p>
             <p><strong>Payment Method:</strong> ${payment_method}</p>
             <hr style="border-color: #333;" />
