@@ -13,12 +13,15 @@ app.get("/", (req, res) => {
 });
 
 const transporter = nodemailer.createTransport({
-  host: '127.0.0.1',
-  port: 1025,
+  host: 'smtp.gmail.com',
+  port: 587,
   secure: false,
-  auth: false,
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
   tls: {
-    rejectUnauthorized: false
+    rejectUnauthorized: false  // ← add this
   }
 });
 
