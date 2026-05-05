@@ -7,6 +7,7 @@ import { Button } from '../components/ui/button';
 import { SectionHeader } from '../components/section-header';
 import { InteractiveGallery } from '../components/interactive-gallery';
 import { PackagesSection } from '../components/packages-section';
+import { useNavigate } from 'react-router-dom';
 
 const services = [
     { icon: Camera, label: 'Our Services', title: 'Classic Booth', description: 'Timeless elegance with our signature enclosed photobooth experience. Perfect for weddings and formal events.' },
@@ -53,6 +54,8 @@ export default function Welcome() {
     };
 
     const parallaxOffset = scrollY * 0.5;
+
+    const navigate = useNavigate();
 
     return (
         <>
@@ -168,13 +171,10 @@ export default function Welcome() {
                         })}
                     </div>
 
-                    {/* ✅ Add this below the timeline */}
                     <div className="mt-4 flex justify-center">
-                        <a href="#packages" onClick={(e) => handleSmoothScroll(e, '#packages')}>
-                            <Button size="lg" className="uppercase">
-                                View Our Packages <ArrowRight className="ml-2 h-4 w-4" />
-                            </Button>
-                        </a>
+                        <Button size="lg" className="uppercase" onClick={() => navigate('/packages')}>
+                            View Our Packages <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
                     </div>
                 </div>
             </div>
@@ -192,7 +192,7 @@ export default function Welcome() {
                 </div>
             </div>
 
-            <PackagesSection />
+
 
             {/* About Section */}
             <div id="about" className="w-full bg-[#1b1b18] py-16 lg:py-24">

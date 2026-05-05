@@ -339,7 +339,7 @@ export function PackagesSection({ onBookOpen }: PackagesSectionProps) {
 
                {/* Cards carousel */}
                 <div
-                    className="overflow-hidden px-1"
+                    className="overflow-hidden px-1 pt-4"
                     onTouchStart={(e) => {
                         (e.currentTarget as any)._startX = e.touches[0].clientX;
                     }}
