@@ -438,7 +438,7 @@ export default function BookingRequestDialog() {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="phone">Phone Number <span className="text-xs text-muted-foreground">(Optional)</span></Label>
+                        <Label htmlFor="phone">Phone Number <span className="text-xs text-muted-foreground"></span></Label>
                         <Input id="phone" type="tel" value={data.phone} onChange={(e) => updateData('phone', e.target.value)} maxLength={20} />
                     </div>
 

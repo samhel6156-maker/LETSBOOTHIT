@@ -1,15 +1,53 @@
 import { useState, useEffect, useRef } from 'react';
 
 const galleryData = [
-    { src: '/images/packages/package_1.png', title: 'Classic 4-Cut', category: 'Classic' },
-    { src: '/images/packages/package_2.png', title: 'Big Frame', category: 'Premium' },
-    { src: '/images/packages/package_3.png', title: 'Scrapbook Style', category: 'Creative' },
-    { src: '/images/packages/package_4.png', title: 'Message Board', category: 'Creative' },
-    { src: '/images/packages/package_5.png', title: 'Passport Strip', category: 'Classic' },
-    { src: '/images/packages/package_6.jpg', title: 'Premium Layout', category: 'Premium' },
+    // Standard Photobooth
+    { src: '/Photobooth photos/Standard photobooth/IMG_4122.JPG', title: 'Standard Photobooth 1', category: 'Standard Photobooth' },
+    { src: '/Photobooth photos/Standard photobooth/IMG_7151.jpg', title: 'Standard Photobooth 2', category: 'Standard Photobooth' },
+
+    // Premium Setup
+    { src: '/Photobooth photos/Premium setup/IMG_5230.JPG', title: 'Premium Setup 1', category: 'Premium Setup' },
+    { src: '/Photobooth photos/Premium setup/IMG_5578.JPG', title: 'Premium Setup 2', category: 'Premium Setup' },
+
+    // Polaroid
+    { src: '/Photobooth photos/Polaroid/IMG_6264.JPG', title: 'Polaroid 1', category: 'Polaroid' },
+
+    // Photoman
+    { src: '/Photobooth photos/Photoman/IMG_0863.JPG', title: 'Photoman 1', category: 'Photoman' },
+    { src: '/Photobooth photos/Photoman/IMG_1133.JPG', title: 'Photoman 2', category: 'Photoman' },
+    { src: '/Photobooth photos/Photoman/IMG_1134.JPG', title: 'Photoman 3', category: 'Photoman' },
+
+    // Our Team
+    { src: '/Photobooth photos/Our team/IMG_6641.JPG', title: 'Our Team 1', category: 'Our Team' },
+
+    // Mirror Booth
+    { src: '/Photobooth photos/Mirror Booth/IMG_5920.jpg', title: 'Mirror Booth 1', category: 'Mirror Booth' },
+    { src: '/Photobooth photos/Mirror Booth/IMG_7197.JPG', title: 'Mirror Booth 2', category: 'Mirror Booth' },
+
+    // Keychain
+    { src: '/Photobooth photos/Keychain/IMG_6600.JPG', title: 'Keychain 1', category: 'Keychain' },
+
+    // Customized Studio
+    { src: '/Photobooth photos/Customized Studio Booth/IMG_6907.JPG', title: 'Customized Studio 1', category: 'Customized Studio' },
+    { src: '/Photobooth photos/Customized Studio Booth/IMG_6918.JPG', title: 'Customized Studio 2', category: 'Customized Studio' },
+
+    // 360 Videobooth
+    { src: '/Photobooth photos/360 videobooth/IMG_6553.JPG', title: '360 Videobooth 1', category: '360 Videobooth' },
+    { src: '/Photobooth photos/360 videobooth/IMG_7996.JPG', title: '360 Videobooth 2', category: '360 Videobooth' },
 ];
 
-const categories = ['All', 'Classic', 'Premium', 'Creative'];
+const categories = [
+    'All',
+    'Standard Photobooth',
+    'Premium Setup',
+    'Polaroid',
+    'Photoman',
+    'Our Team',
+    'Mirror Booth',
+    'Keychain',
+    'Customized Studio',
+    '360 Videobooth',
+];
 
 export function InteractiveGallery() {
     const [activeCategory, setActiveCategory] = useState('All');
@@ -17,11 +55,10 @@ export function InteractiveGallery() {
     const [isAutoPlay, setIsAutoPlay] = useState(true);
     const [isHovering, setIsHovering] = useState(false);
     const autoPlayIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-    const thumbsRef = useRef<HTMLDivElement | null>(null);
 
     const filtered = activeCategory === 'All'
-        ? galleryData
-        : galleryData.filter(g => g.category === activeCategory);
+        ? galleryData.filter(g => g.src !== '')
+        : galleryData.filter(g => g.category === activeCategory && g.src !== '');
 
     useEffect(() => {
         if (!isAutoPlay || isHovering || filtered.length === 0) {
@@ -40,16 +77,17 @@ export function InteractiveGallery() {
         setCurrent(0);
     }, [activeCategory]);
 
-    useEffect(() => {
-        if (thumbsRef.current && thumbsRef.current.children[current]) {
-            const container = thumbsRef.current;
-            const thumb = container.children[current] as HTMLElement;
-            const scrollLeft = thumb.offsetLeft - container.offsetWidth / 2 + thumb.offsetWidth / 2;
-            container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
-        }
-    }, [current]);
-
     const item = filtered[current] ?? filtered[0];
+
+    if (!item) {
+        return (
+            <div className="w-full flex items-center justify-center h-[280px] rounded-2xl bg-[#2a1f1a]">
+                <p className="text-amber-500 text-sm uppercase tracking-widest">
+                    Images coming soon
+                </p>
+            </div>
+        );
+    }
 
     return (
         <div className="w-full">
@@ -113,7 +151,7 @@ export function InteractiveGallery() {
                     </div>
                 </div>
 
-                {/* Categories - horizontal scroll on mobile */}
+                {/* Categories - horizontal scroll */}
                 <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
                     {categories.map(cat => (
                         <button
@@ -121,8 +159,8 @@ export function InteractiveGallery() {
                             key={cat}
                             onClick={() => setActiveCategory(cat)}
                             className={`shrink-0 px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeCategory === cat
-                                    ? 'bg-amber-600 text-white'
-                                    : 'bg-[#2a1f1a] text-gray-300 hover:bg-amber-900/30'
+                                ? 'bg-amber-600 text-white'
+                                : 'bg-[#2a1f1a] text-gray-300 hover:bg-amber-900/30'
                                 }`}
                         >
                             {cat}
@@ -132,26 +170,6 @@ export function InteractiveGallery() {
                     {/* Image counter */}
                     <div className="ml-auto shrink-0 flex items-center px-4 py-2 rounded-lg bg-amber-600 text-white text-sm font-medium">
                         {current + 1} / {filtered.length}
-                    </div>
-                </div>
-
-                {/* Thumbnails */}
-                <div>
-                    <p className="text-xs tracking-[0.2em] text-amber-500 uppercase mb-3">Browse</p>
-                    <div ref={thumbsRef} className="flex gap-3 overflow-x-auto pb-2 scroll-smooth">
-                        {filtered.map((g, i) => (
-                            <button
-                                type="button"
-                                key={`${activeCategory}-${i}`}
-                                onClick={() => setCurrent(i)}
-                                className={`shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden border-2 transition-transform duration-200 ${current === i
-                                        ? 'border-amber-500 scale-105 opacity-100'
-                                        : 'border-transparent opacity-70 hover:opacity-100 hover:scale-105'
-                                    }`}
-                            >
-                                <img src={g.src} alt={g.title} className="w-full h-full object-cover" />
-                            </button>
-                        ))}
                     </div>
                 </div>
             </div>

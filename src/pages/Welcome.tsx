@@ -6,6 +6,8 @@ import { useEffect, useState } from 'react';
 import { Button } from '../components/ui/button';
 import { SectionHeader } from '../components/section-header';
 import { InteractiveGallery } from '../components/interactive-gallery';
+import { PackagesSection } from '../components/packages-section';
+import { useNavigate } from 'react-router-dom';
 
 const services = [
     { icon: Camera, label: 'Our Services', title: 'Classic Booth', description: 'Timeless elegance with our signature enclosed photobooth experience. Perfect for weddings and formal events.' },
@@ -53,6 +55,8 @@ export default function Welcome() {
 
     const parallaxOffset = scrollY * 0.5;
 
+    const navigate = useNavigate();
+
     return (
         <>
             {/* Sticky Header */}
@@ -76,7 +80,7 @@ export default function Welcome() {
                 <div className="absolute inset-0 z-0 overflow-hidden" style={{ transform: `translateY(${parallaxOffset}px)`, willChange: 'transform' }}>
                     <div className="h-full w-full">
                         <img
-                            src="/landingpage-bg.png"
+                            src="/hero_bg.jfif"
                             alt="Background"
                             className="h-full w-full object-cover object-center"
                         />
@@ -166,6 +170,12 @@ export default function Welcome() {
                             );
                         })}
                     </div>
+
+                    <div className="mt-4 flex justify-center">
+                        <Button size="lg" className="uppercase" onClick={() => navigate('/packages')}>
+                            View Our Packages <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                    </div>
                 </div>
             </div>
 
@@ -181,6 +191,8 @@ export default function Welcome() {
                     <InteractiveGallery />
                 </div>
             </div>
+
+
 
             {/* About Section */}
             <div id="about" className="w-full bg-[#1b1b18] py-16 lg:py-24">
@@ -226,9 +238,11 @@ export default function Welcome() {
                         subtitle="Ready to make your event unforgettable? We'd love to hear from you."
                     />
                     <div className="flex justify-center">
-                        <Button size="lg" className="uppercase">
-                            <PhoneCall className="mr-2 h-4 w-4 sm:h-5 sm:w-5" /> Contact Us Today
-                        </Button>
+                        <a href="https://www.facebook.com/letssboothit" target="_blank" rel="noopener noreferrer">
+                            <Button size="lg" className="uppercase">
+                                <PhoneCall className="mr-2 h-4 w-4 sm:h-5 sm:w-5" /> Contact Us Today
+                            </Button>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -239,7 +253,7 @@ export default function Welcome() {
                     <div className="mb-8 grid grid-cols-1 gap-8 sm:mb-12 sm:grid-cols-2 sm:gap-12 md:grid-cols-4">
                         <div className="md:col-span-2">
                             <h3 className="mb-3 text-xl font-medium tracking-[0.15em] uppercase sm:mb-4 sm:text-2xl">Let's Booth It</h3>
-                            <p className="max-w-sm text-sm leading-relaxed text-[#EDEDEC]/70 sm:text-base">Premium photobooth experiences for your most memorable moments. Creating joy, one snapshot at a time.</p>
+                            <p className="max-w-sm text-sm leading-relaxed text-[#EDEDEC]/70 sm:text-base">Where every click becomes a memory, and every pose is a celebration. Elevate your event with our photobooth, making moments unforgettable, one snapshot at a time!</p>
                         </div>
                         <div>
                             <h4 className="mb-4 text-xs tracking-[0.2em] text-[#EDEDEC]/50 uppercase sm:mb-6">Quick Links</h4>
