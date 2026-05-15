@@ -6,7 +6,16 @@ require("dotenv").config();
 const app = express();
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: [
+        'http://localhost:5173',
+        'https://letsboothit.vercel.app', // ← your Vercel URL
+        'https://letsboothit-git-main-smt2.vercel.app', // ← also add preview URLs
+    ],
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Accept'],
+    credentials: true
+}));
 
 app.get("/", (req, res) => {
     res.send("Backend is working");
