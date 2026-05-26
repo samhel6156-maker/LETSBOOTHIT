@@ -1,4 +1,5 @@
 const nodemailer = require("nodemailer");
+require("dotenv").config();
 
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
@@ -8,15 +9,17 @@ const transporter = nodemailer.createTransport({
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
     },
-    tls: {
-        rejectUnauthorized: false
-    }
+    tls: { rejectUnauthorized: false }
 });
 
 module.exports = async function handler(req, res) {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ message: 'Method not allowed' });
-    }
+    // CORS headers
+    res.setHeader('Access-Control-Allow-Origin', 'https://letsboothit.vercel.app');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept');
+
+    if (req.method === 'OPTIONS') return res.status(200).end();
+    if (req.method !== 'POST') return res.status(405).json({ message: 'Method not allowed' });
 
     const {
         first_name, last_name, middle_initial, suffix,
@@ -27,7 +30,6 @@ module.exports = async function handler(req, res) {
     if (!first_name || !last_name || !email || !event_date || !event_location || !pkg || !payment_method) {
         return res.status(400).json({ errors: { general: "Missing required fields." } });
     }
-
     const middleInitial = middle_initial
         ? middle_initial.replace('.', '') + '.'
         : null;
