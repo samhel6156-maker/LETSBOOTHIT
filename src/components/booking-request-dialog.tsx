@@ -348,7 +348,7 @@ export default function BookingRequestDialog() {
         setProcessing(true);
         setErrors({});
         try {
-            const res = await fetch('http://localhost:5050/api/booking', {
+            const res = await fetch('api/booking', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
