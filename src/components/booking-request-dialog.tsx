@@ -348,7 +348,7 @@ export default function BookingRequestDialog() {
         setProcessing(true);
         setErrors({});
         try {
-            const res = await fetch('/api/booking', {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/booking`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
