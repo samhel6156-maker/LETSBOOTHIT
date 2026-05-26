@@ -348,11 +348,7 @@ export default function BookingRequestDialog() {
         setProcessing(true);
         setErrors({});
         try {
-<<<<<<< HEAD
-            const res = await fetch('api/booking', {
-=======
-            const res = await fetch('https://letsboothit.onrender.com/api/booking', {
->>>>>>> e430027be9bc5271089a2811875c32ff38d739fc
+            const res = await fetch('/api/booking', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -360,7 +356,6 @@ export default function BookingRequestDialog() {
                 },
                 body: JSON.stringify(data),
             });
-
             if (res.ok) {
                 toast.success('Booking Submitted!', {
                     description: 'We have received your request and will be in touch shortly.',
