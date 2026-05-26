@@ -1,12 +1,17 @@
 {
-    "experimentalServices": {
-        "frontend": {
-            "routePrefix": "/",
-            "framework": "vite"
-        },
-        "backend": {
-            "root": "backend",
-            "routePrefix": "/_/backend"
-        }
+  "experimentalServices": {
+    "frontend": {
+      "routePrefix": "/",
+      "framework": "vite",
+      "buildCommand": "npm run build",
+      "outputDirectory": "dist",
+      "installCommand": "npm install"
+    },
+    "backend": {
+      "routePrefix": "/_/backend",
+      "framework": "express",
+      "entrypoint": "backend/api/booking.js"
     }
+  },
+  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
 }
