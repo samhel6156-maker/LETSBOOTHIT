@@ -12,6 +12,18 @@ const transporter = nodemailer.createTransport({
     tls: { rejectUnauthorized: false }
 });
 
+const BACKDROP_LABELS = {
+    solid: "Solid Color",
+    sequin: "Sequin Glam",
+    floral: "Floral Wall",
+};
+
+const DURATION_LABELS = {
+    "2h": "2 Hours",
+    "3h": "3 Hours",
+    "4h": "4 Hours",
+};
+
 module.exports = async function handler(req, res) {
     // CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -22,26 +34,33 @@ module.exports = async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ message: 'Method not allowed' });
 
     const {
-        first_name, last_name, middle_initial, suffix,
-        email, phone, event_date, event_location,
-        package: pkg, payment_method,
+        package: pkg,
+        booth_type,
+        backdrop,
+        duration,
+        event_date,
+        start_time,
+        event_type,
+        venue,
+        guest_count,
+        special_requests,
+        full_name,
+        email,
+        phone,
+        total,
     } = req.body;
 
-    if (!first_name || !last_name || !email || !event_date || !event_location || !pkg || !payment_method) {
+    if (!full_name || !email || !phone || !event_date || !start_time || !event_type || !venue || !pkg) {
         return res.status(400).json({ errors: { general: "Missing required fields." } });
     }
-    const middleInitial = middle_initial
-        ? middle_initial.replace('.', '') + '.'
-        : null;
 
-    const fullName = [first_name, middleInitial, last_name, suffix]
-        .filter(Boolean)
-        .join(" ");
-
-    const formattedDate = new Date(event_date).toLocaleString("en-PH", {
+    const formattedDate = new Date(event_date).toLocaleDateString("en-PH", {
         dateStyle: "full",
-        timeStyle: "short",
     });
+
+    const backdropLabel = BACKDROP_LABELS[backdrop] ?? backdrop;
+    const durationLabel = DURATION_LABELS[duration] ?? duration;
+    const boothLabel = booth_type === "premium" ? "Premium Booth" : "Classic Booth";
 
     try {
         await Promise.all([
@@ -51,14 +70,21 @@ module.exports = async function handler(req, res) {
                 subject: "Booking Request Received - Let's Booth It",
                 html: `
                     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-                        <h2 style="color: #d97706;">Hi ${fullName}!</h2>
+                        <h2 style="color: #d97706;">Hi ${full_name}!</h2>
                         <p>Thank you for your booking request. We've received your details and will be in touch shortly to confirm.</p>
                         <hr style="border-color: #333;" />
                         <h3>Booking Summary</h3>
-                        <p><strong>Event Date:</strong> ${formattedDate}</p>
-                        <p><strong>Location:</strong> ${event_location}</p>
                         <p><strong>Package:</strong> ${pkg}</p>
-                        <p><strong>Payment Method:</strong> ${payment_method}</p>
+                        <p><strong>Booth Type:</strong> ${boothLabel}</p>
+                        <p><strong>Backdrop:</strong> ${backdropLabel}</p>
+                        <p><strong>Duration:</strong> ${durationLabel}</p>
+                        <p><strong>Event Date:</strong> ${formattedDate}</p>
+                        <p><strong>Start Time:</strong> ${start_time}</p>
+                        <p><strong>Event Type:</strong> ${event_type}</p>
+                        <p><strong>Venue:</strong> ${venue}</p>
+                        ${guest_count ? `<p><strong>Estimated Guests:</strong> ${guest_count}</p>` : ''}
+                        ${special_requests ? `<p><strong>Special Requests:</strong> ${special_requests}</p>` : ''}
+                        <p><strong>Total:</strong> ₱${Number(total).toLocaleString()}</p>
                         ${phone ? `<p><strong>Phone:</strong> ${phone}</p>` : ''}
                         <hr style="border-color: #333;" />
                         <p style="color: #888;">Let's Booth It Photobooth</p>
@@ -68,21 +94,28 @@ module.exports = async function handler(req, res) {
             transporter.sendMail({
                 from: process.env.MAIL_FROM,
                 to: process.env.OWNER_EMAIL,
-                subject: `New Booking Request from ${fullName}`,
+                subject: `New Booking Request from ${full_name}`,
                 html: `
                     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
                         <h2 style="color: #d97706;">New Booking Request!</h2>
                         <p>A new booking request has been submitted.</p>
                         <hr style="border-color: #333;" />
                         <h3>Customer Details</h3>
-                        <p><strong>Name:</strong> ${fullName}</p>
+                        <p><strong>Name:</strong> ${full_name}</p>
                         <p><strong>Email:</strong> ${email}</p>
                         ${phone ? `<p><strong>Phone:</strong> ${phone}</p>` : ''}
                         <h3>Booking Details</h3>
-                        <p><strong>Event Date:</strong> ${formattedDate}</p>
-                        <p><strong>Location:</strong> ${event_location}</p>
                         <p><strong>Package:</strong> ${pkg}</p>
-                        <p><strong>Payment Method:</strong> ${payment_method}</p>
+                        <p><strong>Booth Type:</strong> ${boothLabel}</p>
+                        <p><strong>Backdrop:</strong> ${backdropLabel}</p>
+                        <p><strong>Duration:</strong> ${durationLabel}</p>
+                        <p><strong>Event Date:</strong> ${formattedDate}</p>
+                        <p><strong>Start Time:</strong> ${start_time}</p>
+                        <p><strong>Event Type:</strong> ${event_type}</p>
+                        <p><strong>Venue:</strong> ${venue}</p>
+                        ${guest_count ? `<p><strong>Estimated Guests:</strong> ${guest_count}</p>` : ''}
+                        ${special_requests ? `<p><strong>Special Requests:</strong> ${special_requests}</p>` : ''}
+                        <p><strong>Total:</strong> ₱${Number(total).toLocaleString()}</p>
                         <hr style="border-color: #333;" />
                         <p style="color: #888;">Let's Booth It Admin Notification</p>
                     </div>

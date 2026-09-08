@@ -1,4 +1,3 @@
-import BookingRequestDialog from "../components/BookingPage";
 import { MarqueeStrip } from "../components/marquee-strip";
 import { Toaster } from "../components/ui/sonner";
 import { PhoneCall } from "lucide-react";
@@ -10,7 +9,6 @@ import { useNavigate } from "react-router-dom";
 import { ScrollReveal } from "../components/scroll-reveal";
 import { AboutSection } from "@/components/aboutSection";
 import { ServicesSection } from "@/components/services-section";
-import BookingPage from "../components/BookingPage";
 
 const socials = [
   { href: "https://facebook.com", label: "Facebook" },
