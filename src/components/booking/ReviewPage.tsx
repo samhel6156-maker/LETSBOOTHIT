@@ -11,15 +11,17 @@ import {
   Phone,
   Sparkles,
   Users,
+  Banknote,
+  Wallet,
+  Landmark,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { useBooking } from "./BookingContext";
 import { StepProgress } from "./StepProgress";
 import { PACKAGES } from "./BookingPage";
 import { TermsDialog } from "./TermsDialog";
-
-console.log("🔍 API URL is:", import.meta.env.VITE_API_URL);
 
 const BACKDROP_LABELS: Record<string, string> = {
   solid: "Solid Color",
@@ -32,6 +34,17 @@ const DURATION_LABELS: Record<string, string> = {
   "3h": "3 Hours",
   "4h": "4 Hours",
 };
+
+const PAYMENT_METHODS = [
+  { value: "cash", label: "Cash", icon: Banknote },
+  { value: "paymaya", label: "PayMaya", icon: Wallet },
+  { value: "gcash", label: "GCash", icon: Wallet },
+  { value: "bpi", label: "BPI", icon: Landmark },
+  { value: "unionbank", label: "UnionBank", icon: Landmark },
+  { value: "bdo", label: "BDO", icon: Landmark },
+  { value: "maribank", label: "Maribank", icon: Landmark },
+  { value: "landbank", label: "Landbank", icon: Landmark },
+];
 
 function BACKDROP_PRICE(value: string) {
   return { solid: 0, sequin: 500, floral: 800 }[value] ?? 0;
@@ -65,6 +78,48 @@ function InfoRow({
   );
 }
 
+function PaymentMethodCard({
+  label,
+  icon: Icon,
+  selected,
+  onSelect,
+}: {
+  label: string;
+  icon: React.ElementType;
+  selected: boolean;
+  onSelect: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className={cn(
+        "flex flex-col items-center gap-2 rounded-xl border p-3 transition-colors",
+        selected
+          ? "border-amber-500/60 bg-amber-500/10"
+          : "border-white/10 bg-[#2a2926] hover:border-white/20",
+      )}
+    >
+      <div className="flex h-10 w-full items-center justify-center">
+        <Icon
+          className={cn(
+            "size-6",
+            selected ? "text-amber-400" : "text-gray-400",
+          )}
+        />
+      </div>
+      <span
+        className={cn(
+          "text-xs font-medium",
+          selected ? "text-white" : "text-gray-400",
+        )}
+      >
+        {label}
+      </span>
+    </button>
+  );
+}
+
 function maskPhone(phone: string) {
   if (phone.length <= 2) return phone;
   return phone.slice(0, 2) + "*".repeat(Math.max(phone.length - 2, 0));
@@ -72,7 +127,13 @@ function maskPhone(phone: string) {
 
 export default function ReviewPage() {
   const navigate = useNavigate();
-  const { state, total, setConfirmationRef, setAgreedToTerms } = useBooking();
+  const {
+    state,
+    total,
+    setConfirmationRef,
+    setAgreedToTerms,
+    setPaymentMethod,
+  } = useBooking();
   const pkg = PACKAGES.find((p) => p.value === state.packageId);
   const [submitting, setSubmitting] = useState(false);
   const [termsOpen, setTermsOpen] = useState(false);
@@ -87,6 +148,10 @@ export default function ReviewPage() {
     state.boothType === "premium" ? "Premium Booth" : "Classic Booth";
 
   const handleSubmit = async () => {
+    if (!state.paymentMethod) {
+      toast.error("Please select a payment method.");
+      return;
+    }
     if (!state.agreedToTerms) {
       toast.error("Please agree to the Terms and Conditions to continue.");
       return;
@@ -114,6 +179,7 @@ export default function ReviewPage() {
           full_name: state.fullName,
           email: state.email,
           phone: state.phone,
+          payment_method: state.paymentMethod,
           total,
         }),
       });
@@ -179,7 +245,7 @@ export default function ReviewPage() {
           </button>
         </div>
 
-        <div className="mt-6 max-w-[744px] mx-auto">
+        <div className="mx-auto mt-6 max-w-[744px]">
           <StepProgress currentStep={4} />
 
           <p className="mt-2 text-xs font-semibold uppercase tracking-[0.15em] text-amber-500">
@@ -193,7 +259,6 @@ export default function ReviewPage() {
             within 24 hours.
           </p>
 
-          {/* Package summary */}
           <div className="mt-6 overflow-hidden rounded-2xl border border-white/8 bg-[#201f1c]">
             <div className="border-b border-white/8 p-5">
               <p className="mb-3 text-[11px] uppercase tracking-wide text-gray-500">
@@ -238,7 +303,6 @@ export default function ReviewPage() {
             </div>
           </div>
 
-          {/* Event details */}
           <div className="mt-6 rounded-2xl border border-white/8 bg-[#201f1c] p-5">
             <p className="mb-4 text-[11px] uppercase tracking-wide text-gray-500">
               Event Details
@@ -284,7 +348,6 @@ export default function ReviewPage() {
             )}
           </div>
 
-          {/* Contact details */}
           <div className="mt-6 rounded-2xl border border-white/8 bg-[#201f1c] p-5">
             <p className="mb-4 text-[11px] uppercase tracking-wide text-gray-500">
               Contact Details
@@ -308,7 +371,24 @@ export default function ReviewPage() {
             </div>
           </div>
 
-          {/* Terms and Conditions */}
+          {/* Payment Method */}
+          <div className="mt-6 rounded-2xl border border-white/8 bg-[#201f1c] p-5">
+            <p className="mb-3 text-[11px] uppercase tracking-wide text-gray-500">
+              Payment Method *
+            </p>
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+              {PAYMENT_METHODS.map((method) => (
+                <PaymentMethodCard
+                  key={method.value}
+                  label={method.label}
+                  icon={method.icon}
+                  selected={state.paymentMethod === method.value}
+                  onSelect={() => setPaymentMethod(method.value)}
+                />
+              ))}
+            </div>
+          </div>
+
           <div className="mt-6 flex items-start gap-3 rounded-2xl border border-white/8 bg-[#201f1c] p-4">
             <button
               type="button"
@@ -353,16 +433,17 @@ export default function ReviewPage() {
           />
 
           <div className="mt-8 flex gap-3">
-            <Button
-              variant="outline"
+            <button
               onClick={() => navigate("/booking/details")}
-              className="flex-1"
+              className="flex-1 rounded-full border border-white/20 py-4 text-base font-semibold text-white transition-colors hover:bg-white/5"
             >
               Back
-            </Button>
+            </button>
             <button
               onClick={handleSubmit}
-              disabled={submitting || !state.agreedToTerms}
+              disabled={
+                submitting || !state.agreedToTerms || !state.paymentMethod
+              }
               className="flex flex-[2] items-center justify-center gap-2 rounded-full bg-amber-500 py-4 text-base font-bold text-black transition-all hover:bg-amber-400 hover:shadow-[0_0_28px_rgba(245,158,11,0.35)] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
             >
               {submitting ? (

@@ -5,26 +5,47 @@ import { ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PACKAGES } from "./BookingPage";
 import { useBooking } from "./BookingContext";
+import BoothSelectionPage from "./BoothSelectionPage";
+import { BackdropCard } from "./BackdropCard";
 
 type BackdropOption = {
   value: string;
   label: string;
   price: number;
   available: boolean;
+  image: string;
 };
 
 const BACKDROP_OPTIONS: BackdropOption[] = [
-  { value: "solid", label: "Solid Color", price: 0, available: true },
-  { value: "sequin", label: "Sequin Glam", price: 500, available: true },
-  { value: "floral", label: "Floral Wall", price: 800, available: false },
+  {
+    value: "solid",
+    label: "Solid Color",
+    price: 0,
+    available: true,
+    image: "/images/backdrop-solid.jpg",
+  },
+  {
+    value: "sequin",
+    label: "Sequin Glam",
+    price: 500,
+    available: true,
+    image: "/images/backdrop-sequin.jpg",
+  },
+  {
+    value: "floral",
+    label: "Floral Wall",
+    price: 800,
+    available: false,
+    image: "/images/backdrop-floral.jpg",
+  },
 ];
 
-type DurationOption = { value: string; label: string; price: number };
-
-const DURATION_OPTIONS: DurationOption[] = [
-  { value: "2h", label: "2 Hours", price: 0 },
-  { value: "3h", label: "3 Hours", price: 1500 },
-  { value: "4h", label: "4 Hours", price: 3000 },
+const NO_BOOTH_SELECTION = [
+  "package_6",
+  "package_7",
+  "package_8",
+  "package_9",
+  "package_10",
 ];
 
 function OptionRow({
@@ -91,6 +112,77 @@ function OptionRow({
   );
 }
 
+function DurationStepper({
+  extraHours,
+  onChange,
+  pricePerHour = 1500,
+  baseHours = 2,
+  maxExtraHours = 4,
+}: {
+  extraHours: number;
+  onChange: (value: number) => void;
+  pricePerHour?: number;
+  baseHours?: number;
+  maxExtraHours?: number;
+}) {
+  const totalHours = baseHours + extraHours;
+  const extraCost = extraHours * pricePerHour;
+
+  return (
+    <div className="mt-5 rounded-2xl border border-white/8 bg-[#201f1c] p-5">
+      <div className="flex items-center justify-between">
+        <h3 className="text-base font-semibold text-white">Session Duration</h3>
+        <span className="rounded-full bg-white/8 px-2.5 py-1 text-xs text-gray-500">
+          {baseHours}h included
+        </span>
+      </div>
+
+      <div className="mt-4 flex items-center justify-between rounded-xl border border-white/10 bg-[#2a2926] px-4 py-3.5">
+        <div>
+          <p className="text-sm font-medium text-white">{totalHours} Hours</p>
+          <p className="mt-0.5 text-xs text-gray-500">
+            {extraHours === 0
+              ? "Included"
+              : `+${extraHours}h · +₱${extraCost.toLocaleString()}`}
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => onChange(Math.max(0, extraHours - 1))}
+            disabled={extraHours === 0}
+            className={cn(
+              "flex size-9 items-center justify-center rounded-full border text-lg font-semibold transition-colors",
+              extraHours === 0
+                ? "border-white/10 text-gray-600 cursor-not-allowed"
+                : "border-white/20 text-white hover:bg-white/10",
+            )}
+          >
+            −
+          </button>
+          <span className="w-4 text-center text-sm font-semibold text-white">
+            {extraHours}
+          </span>
+          <button
+            type="button"
+            onClick={() => onChange(Math.min(maxExtraHours, extraHours + 1))}
+            disabled={extraHours === maxExtraHours}
+            className={cn(
+              "flex size-9 items-center justify-center rounded-full border text-lg font-semibold transition-colors",
+              extraHours === maxExtraHours
+                ? "border-white/10 text-gray-600 cursor-not-allowed"
+                : "border-amber-500/40 bg-amber-500/15 text-amber-400 hover:bg-amber-500/25",
+            )}
+          >
+            +
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function PackageDetailPage() {
   const { packageId } = useParams<{ packageId: string }>();
   const navigate = useNavigate();
@@ -98,16 +190,15 @@ export default function PackageDetailPage() {
   const pkg = PACKAGES.find((p) => p.value === packageId);
 
   const [backdrop, setBackdrop] = useState("solid");
-  const [duration, setDuration] = useState("2h");
+  const [extraHours, setExtraHours] = useState(0);
 
   const total = useMemo(() => {
     if (!pkg) return 0;
     const backdropPrice =
       BACKDROP_OPTIONS.find((o) => o.value === backdrop)?.price ?? 0;
-    const durationPrice =
-      DURATION_OPTIONS.find((o) => o.value === duration)?.price ?? 0;
+    const durationPrice = extraHours * 1500;
     return pkg.price + backdropPrice + durationPrice;
-  }, [pkg, backdrop, duration]);
+  }, [pkg, backdrop, extraHours]);
 
   if (!pkg) {
     return (
@@ -177,6 +268,12 @@ export default function PackageDetailPage() {
           </div>
         </div>
 
+        {!NO_BOOTH_SELECTION.includes(pkg.value) && (
+          <div className="px-4 sm:px-0">
+            <BoothSelectionPage />
+          </div>
+        )}
+
         <div className="px-4 sm:px-0">
           {/* Backdrop Style */}
           <div className="mt-5 rounded-2xl border border-white/8 bg-[#201f1c] p-5">
@@ -188,12 +285,12 @@ export default function PackageDetailPage() {
                 Choose one
               </span>
             </div>
-            <div className="mt-4 flex flex-col gap-2">
+            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
               {BACKDROP_OPTIONS.map((opt) => (
-                <OptionRow
+                <BackdropCard
                   key={opt.value}
+                  image={opt.image}
                   label={opt.label}
-                  sublabel={!opt.available ? "Not Available" : undefined}
                   priceLabel={
                     opt.price === 0
                       ? "Included"
@@ -208,31 +305,7 @@ export default function PackageDetailPage() {
           </div>
 
           {/* Session Duration */}
-          <div className="mt-5 rounded-2xl border border-white/8 bg-[#201f1c] p-5">
-            <div className="flex items-center justify-between">
-              <h3 className="text-base font-semibold text-white">
-                Session Duration
-              </h3>
-              <span className="rounded-full bg-white/8 px-2.5 py-1 text-xs text-gray-500">
-                Choose one
-              </span>
-            </div>
-            <div className="mt-4 flex flex-col gap-2">
-              {DURATION_OPTIONS.map((opt) => (
-                <OptionRow
-                  key={opt.value}
-                  label={opt.label}
-                  priceLabel={
-                    opt.price === 0
-                      ? "Included"
-                      : `+₱${opt.price.toLocaleString()}`
-                  }
-                  selected={duration === opt.value}
-                  onSelect={() => setDuration(opt.value)}
-                />
-              ))}
-            </div>
-          </div>
+          <DurationStepper extraHours={extraHours} onChange={setExtraHours} />
         </div>
       </div>
 
@@ -249,8 +322,8 @@ export default function PackageDetailPage() {
           </div>
           <button
             onClick={() => {
-              setPackage(pkg.value, backdrop, duration);
-              navigate("/booking/booth");
+              setPackage(pkg.value, backdrop, `${2 + extraHours}h`);
+              navigate("/booking/event");
             }}
             className="flex-1 rounded-full bg-amber-500 py-4 text-base font-bold text-black hover:bg-amber-400 transition-colors"
           >

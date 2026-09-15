@@ -166,7 +166,7 @@ export default function Welcome() {
       <MarqueeStrip />
 
       {/* Services Section */}
-      <div id="services" className="w-full bg-[#1b1b18] py-16 lg:py-24">
+      <div id="services" className="w-full bg-[#1b1b18] py-16 lg:py-10">
         <ServicesSection />
       </div>
 
@@ -188,12 +188,12 @@ export default function Welcome() {
       </div>
 
       {/* About Section */}
-      <div id="about" className="w-full bg-[#1b1b18] py-16 lg:py-24">
+      <div id="about" className="w-full bg-[#1b1b18] py-3 lg:py-5">
         <AboutSection />
       </div>
 
       {/* Contact Section */}
-      <div id="contact" className="w-full bg-[#1b1b18] py-16 lg:py-24">
+      <div id="contact" className="w-full bg-[#1b1b18] py-16 lg:py-20">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <ScrollReveal animation="up">
             <SectionHeader

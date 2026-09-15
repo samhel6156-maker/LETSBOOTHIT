@@ -2,7 +2,7 @@
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const STEPS = ["Booth", "Event", "Details", "Confirm"];
+const STEPS = ["Event", "Details", "Confirm"];
 
 export function StepProgress({ currentStep }: { currentStep: number }) {
   return (

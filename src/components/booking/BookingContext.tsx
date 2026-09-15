@@ -18,6 +18,7 @@ type BookingState = {
   fullName: string;
   email: string;
   phone: string;
+  paymentMethod: string;
   confirmationRef: string | null;
   agreedToTerms: boolean;
 };
@@ -43,6 +44,7 @@ type BookingContextType = {
   setBoothType: (type: BoothType) => void;
   updateEventDetails: (fields: Partial<EventDetailsFields>) => void;
   updateContactDetails: (fields: Partial<ContactDetailsFields>) => void;
+  setPaymentMethod: (method: string) => void;
   setConfirmationRef: (ref: string) => void;
   setAgreedToTerms: (agreed: boolean) => void;
   resetBooking: () => void;
@@ -77,6 +79,7 @@ const INITIAL_STATE: BookingState = {
   fullName: "",
   email: "",
   phone: "",
+  paymentMethod: "",
   confirmationRef: null,
   agreedToTerms: false,
 };
@@ -95,6 +98,9 @@ export function BookingProvider({ children }: { children: ReactNode }) {
 
   const updateContactDetails = (fields: Partial<ContactDetailsFields>) =>
     setState((prev) => ({ ...prev, ...fields }));
+
+  const setPaymentMethod = (method: string) =>
+    setState((prev) => ({ ...prev, paymentMethod: method }));
 
   const setConfirmationRef = (ref: string) =>
     setState((prev) => ({ ...prev, confirmationRef: ref }));
@@ -119,6 +125,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
         setBoothType,
         updateEventDetails,
         updateContactDetails,
+        setPaymentMethod,
         setConfirmationRef,
         setAgreedToTerms,
         resetBooking,

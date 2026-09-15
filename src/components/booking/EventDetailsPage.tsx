@@ -5,7 +5,6 @@ import { ArrowLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useBooking } from "./BookingContext";
 import { StepProgress } from "./StepProgress";
@@ -244,20 +243,18 @@ export default function EventDetailsPage() {
             )}
 
             <div className="mt-8 flex gap-3">
-              <Button
-                variant="outline"
-                onClick={() => navigate("/booking/booth")}
-                className="flex-1"
+              <button
+                onClick={() => navigate("/booking/package/package_1")}
+                className="flex-1 rounded-full border border-white/20 py-4 text-base font-semibold text-white transition-colors hover:bg-white/5"
               >
                 Back
-              </Button>
-              <Button
-                variant="amber"
+              </button>
+              <button
                 onClick={handleNext}
-                className="flex-1 lg:flex-none lg:min-w-40"
+                className="flex-1 rounded-full bg-amber-500 py-4 text-base font-bold text-black transition-all hover:bg-amber-400 hover:shadow-[0_0_28px_rgba(245,158,11,0.35)]"
               >
-                Next: Your Details
-              </Button>
+                Review Booking
+              </button>
             </div>
           </div>
 

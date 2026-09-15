@@ -57,7 +57,7 @@ export function OrderSummary() {
   return (
     <>
       {/* Desktop: static sidebar */}
-      <div className="hidden w-full shrink-0 rounded-2xl border border-white/10 bg-[#201f1c] p-5 lg:block lg:w-[320px]">
+      <div className="hidden w-full shrink-0 self-start rounded-2xl border border-white/10 bg-[#201f1c] p-5 lg:block lg:w-[320px]">
         <div className="flex items-center gap-2">
           <Receipt className="size-4 text-white" />
           <p className="text-sm font-bold uppercase tracking-wide text-white">

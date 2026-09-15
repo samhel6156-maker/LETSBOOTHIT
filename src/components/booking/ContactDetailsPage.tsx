@@ -180,20 +180,18 @@ export default function ContactDetailsPage() {
             )}
 
             <div className="mt-8 flex gap-3">
-              <Button
-                variant="outline"
+              <button
                 onClick={() => navigate("/booking/event")}
-                className="flex-1"
+                className="flex-1 rounded-full border border-white/20 py-4 text-base font-semibold text-white transition-colors hover:bg-white/5"
               >
                 Back
-              </Button>
-              <Button
-                variant="amber"
+              </button>
+              <button
                 onClick={handleNext}
-                className="flex-1 lg:flex-none lg:min-w-40"
+                className="flex-1 rounded-full bg-amber-500 py-4 text-base font-bold text-black transition-all hover:bg-amber-400 hover:shadow-[0_0_28px_rgba(245,158,11,0.35)]"
               >
                 Review Booking
-              </Button>
+              </button>
             </div>
           </div>
 

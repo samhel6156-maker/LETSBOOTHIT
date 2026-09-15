@@ -84,7 +84,7 @@ export default function ConfirmationPage() {
           </div>
         </div>
 
-        <div className="mt-6 max-w-[744px]">
+        <div className="mt-6 max-w-[744px] mx-auto">
           <StepProgress currentStep={4} />
 
           {/* Success card */}
@@ -170,13 +170,12 @@ export default function ConfirmationPage() {
 
           {/* Actions */}
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Button
-              variant="outline"
-              onClick={() => navigate("/")}
-              className="flex-1 rounded-full py-3.5"
+            <button
+              onClick={() => navigate("/booking/details")}
+              className="flex-1 rounded-full border border-white/20 py-4 text-base font-semibold text-white transition-colors hover:bg-white/5"
             >
               Back to Home
-            </Button>
+            </button>
             <button
               onClick={handleBookAnother}
               className="flex flex-1 items-center justify-center gap-2 rounded-full bg-amber-500 py-3.5 text-sm font-bold text-black transition-colors hover:bg-amber-400"

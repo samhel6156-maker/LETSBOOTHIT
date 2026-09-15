@@ -24,6 +24,17 @@ const DURATION_LABELS = {
     "4h": "4 Hours",
 };
 
+const PAYMENT_METHOD_LABELS = {
+    cash: "Cash",
+    paymaya: "PayMaya",
+    gcash: "GCash",
+    bpi: "BPI",
+    unionbank: "UnionBank",
+    bdo: "BDO",
+    maribank: "Maribank",
+    landbank: "Landbank",
+};
+
 module.exports = async function handler(req, res) {
     // CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -47,10 +58,11 @@ module.exports = async function handler(req, res) {
         full_name,
         email,
         phone,
+        payment_method,
         total,
     } = req.body;
 
-    if (!full_name || !email || !phone || !event_date || !start_time || !event_type || !venue || !pkg) {
+    if (!full_name || !email || !phone || !event_date || !start_time || !event_type || !venue || !pkg || !payment_method) {
         return res.status(400).json({ errors: { general: "Missing required fields." } });
     }
 
@@ -61,6 +73,7 @@ module.exports = async function handler(req, res) {
     const backdropLabel = BACKDROP_LABELS[backdrop] ?? backdrop;
     const durationLabel = DURATION_LABELS[duration] ?? duration;
     const boothLabel = booth_type === "premium" ? "Premium Booth" : "Classic Booth";
+    const paymentLabel = PAYMENT_METHOD_LABELS[payment_method] ?? payment_method;
 
     try {
         await Promise.all([
@@ -84,6 +97,7 @@ module.exports = async function handler(req, res) {
                         <p><strong>Venue:</strong> ${venue}</p>
                         ${guest_count ? `<p><strong>Estimated Guests:</strong> ${guest_count}</p>` : ''}
                         ${special_requests ? `<p><strong>Special Requests:</strong> ${special_requests}</p>` : ''}
+                        <p><strong>Payment Method:</strong> ${paymentLabel}</p>
                         <p><strong>Total:</strong> ₱${Number(total).toLocaleString()}</p>
                         ${phone ? `<p><strong>Phone:</strong> ${phone}</p>` : ''}
                         <hr style="border-color: #333;" />
@@ -115,6 +129,7 @@ module.exports = async function handler(req, res) {
                         <p><strong>Venue:</strong> ${venue}</p>
                         ${guest_count ? `<p><strong>Estimated Guests:</strong> ${guest_count}</p>` : ''}
                         ${special_requests ? `<p><strong>Special Requests:</strong> ${special_requests}</p>` : ''}
+                        <p><strong>Payment Method:</strong> ${paymentLabel}</p>
                         <p><strong>Total:</strong> ₱${Number(total).toLocaleString()}</p>
                         <hr style="border-color: #333;" />
                         <p style="color: #888;">Let's Booth It Admin Notification</p>
