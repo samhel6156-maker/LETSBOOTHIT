@@ -166,6 +166,30 @@ function ServiceDetailsModal({
             </li>
           ))}
         </ul>
+        {service.addOns && service.addOns.length > 0 && (
+          <>
+            <p className="mt-6 text-xs font-semibold uppercase tracking-wide text-gray-500">
+              Optional Add-ons
+            </p>
+            <ul className="mt-3 space-y-3">
+              {service.addOns.map((addOn) => (
+                <li key={addOn.label} className="rounded-lg bg-white/5 p-3">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium text-white">
+                      {addOn.label}
+                    </p>
+                    <p className="text-sm font-semibold text-amber-500">
+                      {addOn.price}
+                    </p>
+                  </div>
+                  <p className="mt-1 text-xs text-gray-400">
+                    {addOn.description}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
       </div>
     </div>
   );

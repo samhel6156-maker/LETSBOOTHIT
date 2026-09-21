@@ -1,11 +1,13 @@
 import {
   Camera,
-  Sparkles,
+  Star,
+  Video,
   Users,
-  Palette,
-  type LucideIcon,
-  Book,
+  Sparkles,
+  Newspaper,
+  Footprints,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 export type ServiceItem = {
   slug: string;
@@ -18,13 +20,18 @@ export type ServiceItem = {
   price: string;
   duration: string;
   extraHour: string;
+  addOns?: {
+    label: string;
+    price: string;
+    description: string;
+  }[];
 };
 
 export const services: ServiceItem[] = [
   {
     slug: "classic-booth",
     icon: Camera,
-    label: "Our Services",
+    label: "Timeless Classic",
     title: "Classic Booth",
     description:
       "Timeless elegance with our signature enclosed photobooth experience. Perfect for weddings and formal events.",
@@ -38,16 +45,16 @@ export const services: ServiceItem[] = [
     ],
     images: [
       {
-        src: "https://picsum.photos/seed/classic1/600/400",
-        alt: "Classic enclosed photobooth",
+        src: "/Photobooth photos/Lets Booth it Photos/Photobooth setups/Classic Setup.png",
+        alt: "Classic Booth setup",
       },
       {
-        src: "https://picsum.photos/seed/classic2/600/400",
-        alt: "Guests inside classic booth",
+        src: "/Photobooth photos/.../Classic Setup 2.png",
+        alt: "Classic Booth setup - angle 2",
       },
       {
-        src: "https://picsum.photos/seed/classic3/600/400",
-        alt: "Classic booth photo prints",
+        src: "/Photobooth photos/.../Classic Setup 3.png",
+        alt: "Classic Booth setup - angle 3",
       },
     ],
     price: "₱2,500",
@@ -55,9 +62,9 @@ export const services: ServiceItem[] = [
     extraHour: "+₱1,000",
   },
   {
-    slug: "Premium-booth",
-    icon: Camera,
-    label: "Our Services",
+    slug: "premium-booth",
+    icon: Star,
+    label: "Premium Pick",
     title: "Premium Booth",
     description:
       "Timeless elegance with our signature enclosed photobooth experience. Perfect for weddings and formal events.",
@@ -71,16 +78,16 @@ export const services: ServiceItem[] = [
     ],
     images: [
       {
-        src: "https://picsum.photos/seed/classic1/600/400",
-        alt: "Classic enclosed photobooth",
+        src: "/Photobooth photos/Lets Booth it Photos/Photobooth setups/Premium Setup.png",
+        alt: "Premium Booth setup",
       },
       {
-        src: "https://picsum.photos/seed/classic2/600/400",
-        alt: "Guests inside classic booth",
+        src: "/Photobooth photos/Lets Booth it Photos/Photobooth setups/Premium Setup 2.png",
+        alt: "Premium Booth setup - angle 2",
       },
       {
-        src: "https://picsum.photos/seed/classic3/600/400",
-        alt: "Classic booth photo prints",
+        src: "/Photobooth photos/Lets Booth it Photos/Photobooth setups/Premium Setup 3.png",
+        alt: "Premium Booth setup - angle 3",
       },
     ],
     price: "₱3,500",
@@ -89,8 +96,8 @@ export const services: ServiceItem[] = [
   },
   {
     slug: "video-booth",
-    icon: Sparkles,
-    label: "Experience",
+    icon: Video,
+    label: "360 Experience",
     title: "360° Video Booth",
     description:
       "Capture 360° videos as our camera rotates around you and your guests on a stationary platform. Each session can accommodate up to 4 guests.",
@@ -104,16 +111,16 @@ export const services: ServiceItem[] = [
     ],
     images: [
       {
-        src: "https://picsum.photos/seed/video1/600/400",
-        alt: "360 video booth platform",
+        src: "/Photobooth photos/Lets Booth it Photos/Photobooth setups/360 Video Booth.png",
+        alt: "360° Video Booth setup",
       },
       {
-        src: "https://picsum.photos/seed/video2/600/400",
-        alt: "Guest on 360 platform",
+        src: "/Photobooth photos/Lets Booth it Photos/Photobooth setups/....png",
+        alt: "360° Video Booth setup",
       },
       {
-        src: "https://picsum.photos/seed/video3/600/400",
-        alt: "Slow-motion capture moment",
+        src: "/Photobooth photos/Lets Booth it Photos/Photobooth setups/....png",
+        alt: "360° Video Booth setup",
       },
     ],
     price: "₱10,000",
@@ -121,7 +128,7 @@ export const services: ServiceItem[] = [
     extraHour: "+₱2,000",
   },
   {
-    slug: "High Angle",
+    slug: "high-angle",
     icon: Users,
     label: "Group Fun",
     title: "High Angle",
@@ -138,16 +145,16 @@ export const services: ServiceItem[] = [
     ],
     images: [
       {
-        src: "https://picsum.photos/seed/openair1/600/400",
-        alt: "Open air photobooth setup",
+        src: "/Photobooth photos/Lets Booth it Photos/Photobooth setups/High Angle.png",
+        alt: "High Angle setup",
       },
       {
-        src: "https://picsum.photos/seed/openair2/600/400",
-        alt: "Large group photo",
+        src: "/Photobooth photos/.../High Angle 2.png",
+        alt: "High Angle setup - angle 2",
       },
       {
-        src: "https://picsum.photos/seed/openair3/600/400",
-        alt: "Custom backdrop display",
+        src: "/Photobooth photos/.../High Angle 3.png",
+        alt: "High Angle setup - angle 3",
       },
     ],
     price: "₱10,000",
@@ -155,9 +162,9 @@ export const services: ServiceItem[] = [
     extraHour: "+₱2,000",
   },
   {
-    slug: "Magazine Booth",
-    icon: Palette,
-    label: "Branding",
+    slug: "mirror-booth",
+    icon: Sparkles,
+    label: "Mirror Magic",
     title: "Mirror Booth",
     description:
       "An interactive mirror booth that lets guests choose from different photo layouts, including 4R, Strips and Polaroid prints. Add keychain prints for an additional charge. Your photos come as magnetic prints, perfect for displaying on your fridge or any magnetic surface.",
@@ -173,16 +180,16 @@ export const services: ServiceItem[] = [
     ],
     images: [
       {
-        src: "https://picsum.photos/seed/branded1/600/400",
-        alt: "Branded backdrop setup",
+        src: "/Photobooth photos/Lets Booth it Photos/Photobooth setups/Mirror Booth.png",
+        alt: "Mirror Booth setup",
       },
       {
-        src: "https://picsum.photos/seed/branded2/600/400",
-        alt: "Custom branded photo strip",
+        src: "/Photobooth photos/.../Mirror Booth 2.png",
+        alt: "Mirror Booth setup - angle 2",
       },
       {
-        src: "https://picsum.photos/seed/branded3/600/400",
-        alt: "On-brand event photobooth",
+        src: "/Photobooth photos/.../Mirror Booth 3.png",
+        alt: "Mirror Booth setup - angle 3",
       },
     ],
     price: "₱10,000",
@@ -190,9 +197,9 @@ export const services: ServiceItem[] = [
     extraHour: "+₱1,500",
   },
   {
-    slug: "Magazine Booth",
-    icon: Book,
-    label: "Our Services",
+    slug: "magazine-booth",
+    icon: Newspaper,
+    label: "Cover Story",
     title: "Magazine Booth",
     description:
       "A 7 × 7 ft photo booth that turns your photos into personalized magazine covers. ",
@@ -202,18 +209,31 @@ export const services: ServiceItem[] = [
       "Fun Props",
       "Free transportation within QC ",
     ],
+    addOns: [
+      {
+        label: "Photographer",
+        price: "+₱3,000",
+        description:
+          "Includes professional photo coverage and 4 × 6-inch photo prints with a cardboard standee frame.",
+      },
+      {
+        label: "Magnetic Prints",
+        price: "+₱2,000",
+        description: "Upgrade your prints to magnetic photo keepsakes.",
+      },
+    ],
     images: [
       {
-        src: "https://picsum.photos/seed/classic1/600/400",
-        alt: "Classic enclosed photobooth",
+        src: "/Photobooth photos/Lets Booth it Photos/Photobooth setups/Magazine Booth.png",
+        alt: "Magazine Booth setup",
       },
       {
-        src: "https://picsum.photos/seed/classic2/600/400",
-        alt: "Guests inside classic booth",
+        src: "/Photobooth photos/.../Magazine Booth 2.png",
+        alt: "Magazine Booth setup - angle 2",
       },
       {
-        src: "https://picsum.photos/seed/classic3/600/400",
-        alt: "Classic booth photo prints",
+        src: "/Photobooth photos/.../Magazine Booth 3.png",
+        alt: "Magazine Booth setup - angle 3",
       },
     ],
     price: "₱10,000",
@@ -221,9 +241,9 @@ export const services: ServiceItem[] = [
     extraHour: "+₱2,000",
   },
   {
-    slug: "Photoman",
-    icon: Camera,
-    label: "Our Services",
+    slug: "photoman",
+    icon: Footprints,
+    label: "On The Move",
     title: "Photoman",
     description:
       "A professional roaming photo booth experience that brings the camera directly to your guests. Our Photoman captures candid, engaging moments throughout your event, with each session producing 4 × 6-inch photo prints presented in a cardboard standee frame—a fun and memorable keepsake your guests can take home and display.",
@@ -234,18 +254,25 @@ export const services: ServiceItem[] = [
       "Fun Props",
       "Free transportation within QC ",
     ],
+    addOns: [
+      {
+        label: "Magnetic Upgrade (1mm)",
+        price: "+₱1,000",
+        description: "Want your photo to be magnetic? Upgrade for just ₱1,000.",
+      },
+    ],
     images: [
       {
-        src: "https://picsum.photos/seed/classic1/600/400",
-        alt: "Classic enclosed photobooth",
+        src: "/Photobooth photos/Lets Booth it Photos/Packages/Photoman.png",
+        alt: "Photoman roaming booth",
       },
       {
-        src: "https://picsum.photos/seed/classic2/600/400",
-        alt: "Guests inside classic booth",
+        src: "/Photobooth photos/.../Photoman 2.png",
+        alt: "Photoman roaming booth - angle 2",
       },
       {
-        src: "https://picsum.photos/seed/classic3/600/400",
-        alt: "Classic booth photo prints",
+        src: "/Photobooth photos/.../Photoman 3.png",
+        alt: "Photoman roaming booth - angle 3",
       },
     ],
     price: "₱5,000",

@@ -201,24 +201,6 @@ export default function EventDetailsPage() {
                   message={errors.venue}
                 />
               </div>
-
-              <div>
-                <Label htmlFor="guest-count">
-                  Estimated Guest Count{" "}
-                  <span className="font-normal text-gray-600">(optional)</span>
-                </Label>
-                <Input
-                  id="guest-count"
-                  type="number"
-                  min="1"
-                  placeholder="e.g. 150"
-                  value={state.guestCount}
-                  onChange={(e) =>
-                    updateEventDetails({ guestCount: e.target.value })
-                  }
-                />
-              </div>
-
               <div>
                 <Label htmlFor="special-requests">
                   Special Requests{" "}

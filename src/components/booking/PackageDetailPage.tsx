@@ -1,5 +1,5 @@
 // src/components/booking/PackageDetailPage.tsx
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -16,101 +16,106 @@ type BackdropOption = {
   image: string;
 };
 
-const BACKDROP_OPTIONS: BackdropOption[] = [
+const CLASSIC_BACKDROP_OPTIONS: BackdropOption[] = [
   {
-    value: "solid",
-    label: "Solid Color",
+    value: "blue",
+    label: "Blue",
     price: 0,
     available: true,
-    image: "/images/backdrop-solid.jpg",
+    image:
+      "/Photobooth photos/Lets Booth it Photos/classic backdrop/23241738-1976-4AE2-AF37-F2297ED5B3ED.png",
   },
   {
-    value: "sequin",
-    label: "Sequin Glam",
-    price: 500,
+    value: "red",
+    label: "Red",
+    price: 0,
     available: true,
-    image: "/images/backdrop-sequin.jpg",
+    image:
+      "/Photobooth photos/Lets Booth it Photos/classic backdrop/34A6F23F-A0A1-4233-A4E5-814C9EF96E7D.png",
   },
   {
-    value: "floral",
+    value: "white-sparkle",
+    label: "White Sparkle",
+    price: 0,
+    available: true,
+    image:
+      "/Photobooth photos/Lets Booth it Photos/classic backdrop/B594E08D-0244-4FA8-9A47-04B62C21E8FE.png",
+  },
+  {
+    value: "pink-sequin",
+    label: "Pink Sequin",
+    price: 0,
+    available: true,
+    image:
+      "/Photobooth photos/Lets Booth it Photos/classic backdrop/BCBE293C-0568-40ED-91B3-9E2A25683E0B.png",
+  },
+  {
+    value: "silver-sequin",
+    label: "Silver Sequin",
+    price: 0,
+    available: true,
+    image:
+      "/Photobooth photos/Lets Booth it Photos/classic backdrop/E50A2B39-5858-476A-BB76-590795C2F3C6.png",
+  },
+  {
+    value: "black-sequin",
+    label: "Black Sequin",
+    price: 0,
+    available: true,
+    image:
+      "/Photobooth photos/Lets Booth it Photos/classic backdrop/E91CDD61-D439-4748-9F5C-3E7178FDF2F8.png",
+  },
+];
+
+const PREMIUM_BACKDROP_OPTIONS: BackdropOption[] = [
+  {
+    value: "floral-wall",
     label: "Floral Wall",
-    price: 800,
-    available: false,
-    image: "/images/backdrop-floral.jpg",
+    price: 0,
+    available: true,
+    image:
+      "/Photobooth photos/Lets Booth it Photos/Premium Setup/6DE03476-D422-4DAA-95AD-6CC7316585D8.png",
+  },
+  {
+    value: "gold-geometric-black",
+    label: "Gold Geometric (Black)",
+    price: 0,
+    available: true,
+    image:
+      "/Photobooth photos/Lets Booth it Photos/Premium Setup/9401EF6B-D3C3-41DF-A08E-61043E668E48.png",
+  },
+  {
+    value: "marble-pink",
+    label: "Marble Pink",
+    price: 0,
+    available: true,
+    image:
+      "/Photobooth photos/Lets Booth it Photos/Premium Setup/BA9E5609-ADAB-4121-9D7D-22DB0E637A8D.png",
+  },
+  {
+    value: "white-grid",
+    label: "White Grid",
+    price: 0,
+    available: true,
+    image:
+      "/Photobooth photos/Lets Booth it Photos/Premium Setup/BDA3F184-F999-480F-9853-6FE81236F168.png",
+  },
+  {
+    value: "gold-geometric-white",
+    label: "Gold Geometric (White)",
+    price: 0,
+    available: true,
+    image:
+      "/Photobooth photos/Lets Booth it Photos/Premium Setup/E08B3508-533F-475D-A016-422030F7370F.png",
   },
 ];
 
 const NO_BOOTH_SELECTION = [
-  "package_6",
   "package_7",
   "package_8",
   "package_9",
   "package_10",
 ];
-
-function OptionRow({
-  label,
-  sublabel,
-  priceLabel,
-  selected,
-  disabled,
-  onSelect,
-}: {
-  label: string;
-  sublabel?: string;
-  priceLabel: string;
-  selected: boolean;
-  disabled?: boolean;
-  onSelect: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      disabled={disabled}
-      onClick={onSelect}
-      className={cn(
-        "flex w-full items-center justify-between rounded-xl border px-4 py-3.5 text-left transition-colors",
-        disabled && "opacity-40 cursor-not-allowed border-white/8",
-        !disabled && selected && "border-amber-600/60 bg-amber-500/10",
-        !disabled &&
-          !selected &&
-          "border-white/10 bg-[#2a2926] hover:border-white/20",
-      )}
-    >
-      <div className="flex items-center gap-3">
-        <span
-          className={cn(
-            "flex size-4 shrink-0 items-center justify-center rounded-full border-[1.6px]",
-            selected ? "border-amber-500 bg-amber-500" : "border-white/30",
-          )}
-        >
-          {selected && <span className="size-1.5 rounded-full bg-black" />}
-        </span>
-        <div className="flex flex-col">
-          <span
-            className={cn(
-              "text-sm font-medium",
-              selected ? "text-white" : "text-gray-300",
-            )}
-          >
-            {label}
-          </span>
-          {sublabel && (
-            <span className="text-xs text-gray-500">{sublabel}</span>
-          )}
-        </div>
-      </div>
-      <span
-        className={cn(
-          "text-sm font-semibold",
-          selected ? "text-gray-500" : "text-gray-400",
-        )}
-      >
-        {priceLabel}
-      </span>
-    </button>
-  );
-}
 
 function DurationStepper({
   extraHours,
@@ -186,11 +191,20 @@ function DurationStepper({
 export default function PackageDetailPage() {
   const { packageId } = useParams<{ packageId: string }>();
   const navigate = useNavigate();
-  const { setPackage } = useBooking();
+  const { state, setPackage } = useBooking();
   const pkg = PACKAGES.find((p) => p.value === packageId);
 
-  const [backdrop, setBackdrop] = useState("solid");
+  const BACKDROP_OPTIONS =
+    state.boothType === "premium"
+      ? PREMIUM_BACKDROP_OPTIONS
+      : CLASSIC_BACKDROP_OPTIONS;
+
+  const [backdrop, setBackdrop] = useState(BACKDROP_OPTIONS[0].value);
   const [extraHours, setExtraHours] = useState(0);
+
+  useEffect(() => {
+    setBackdrop(BACKDROP_OPTIONS[0].value);
+  }, [state.boothType]);
 
   const total = useMemo(() => {
     if (!pkg) return 0;
@@ -198,7 +212,7 @@ export default function PackageDetailPage() {
       BACKDROP_OPTIONS.find((o) => o.value === backdrop)?.price ?? 0;
     const durationPrice = extraHours * 1500;
     return pkg.price + backdropPrice + durationPrice;
-  }, [pkg, backdrop, extraHours]);
+  }, [pkg, backdrop, extraHours, BACKDROP_OPTIONS]);
 
   if (!pkg) {
     return (

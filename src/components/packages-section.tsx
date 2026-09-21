@@ -11,7 +11,6 @@ import {
   Star,
   Zap,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const packages = [
@@ -168,16 +167,28 @@ const packages = [
     icon: Palette,
     title: "Magazine Booth",
     description:
-      "Magazine cover-style prints that make every guest feel like a celebrity on the cover.",
+      "A 7 × 7 ft photo booth that turns your photos into personalized magazine covers.",
     price: "₱10,000",
     duration: "3 hours",
     additionalHour: "₱2,000",
     includes: [
-      "Unlimited shots",
-      "Magazine cover prints",
-      "Custom masthead design",
-      "3 backdrop options",
-      "Digital copies via QR",
+      "Free Transportation within Quezon City",
+      "Fun Props",
+      "Instant QR code sharing with photographer add-on",
+      "2-3 booth attendants",
+    ],
+    addOns: [
+      {
+        label: "Photographer",
+        price: "+₱3,000",
+        description:
+          "Includes professional photo coverage and 4 × 6-inch photo prints with a cardboard standee frame.",
+      },
+      {
+        label: "Magnetic Prints",
+        price: "+₱2,000",
+        description: "Upgrade your prints to magnetic photo keepsakes.",
+      },
     ],
     featured: true,
   },
@@ -187,16 +198,22 @@ const packages = [
     icon: Users,
     title: "Photoman",
     description:
-      "Roving photobooth attendant that brings the camera to your guests anywhere in the venue.",
+      "A professional roaming photo booth experience that brings the camera directly to your guests. Our Photoman captures candid, engaging moments throughout your event, with each session producing 4 × 6-inch photo prints presented in a cardboard standee frame—a fun and memorable keepsake your guests can take home and display.",
     price: "₱5,000",
     duration: "2 hours",
     additionalHour: "₱2,500",
     includes: [
-      "Unlimited shots",
-      "Roving booth setup",
-      "+₱2,000 for magnetic",
-      "Digital copies via QR",
-      "1 roving attendant",
+      "Free Transportation within Quezon City",
+      "Fun Props",
+      "Unlimited Shots",
+      "2-3 booth attendants",
+    ],
+    addOns: [
+      {
+        label: "Magnetic Upgrade (1mm)",
+        price: "+₱1,000",
+        description: "Want your photo to be magnetic? Upgrade for just ₱1,000.",
+      },
     ],
   },
 ];
@@ -309,6 +326,31 @@ function PackageCard({ pkg, onBook }: PackageCardProps) {
           ))}
         </ul>
       </div>
+      {/* Add-ons */}
+      {pkg.addOns && pkg.addOns.length > 0 && (
+        <div className="mb-2">
+          <p className="mb-3 text-xs tracking-[0.15em] text-gray-500 uppercase">
+            Optional Add-ons
+          </p>
+          <ul className="space-y-3">
+            {pkg.addOns.map((addOn, i) => (
+              <li key={i} className="rounded-lg bg-white/5 p-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium text-white">
+                    {addOn.label}
+                  </p>
+                  <p className="text-sm font-semibold text-amber-500">
+                    {addOn.price}
+                  </p>
+                </div>
+                <p className="mt-1 text-xs text-gray-400">
+                  {addOn.description}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
