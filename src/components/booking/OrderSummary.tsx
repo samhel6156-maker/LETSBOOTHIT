@@ -13,6 +13,8 @@ const INCLUDED_ITEMS = [
   "Customized Photo Layout",
 ];
 
+const PROMO_PACKAGES = ["package_8", "package_9", "package_11"];
+
 function SummaryLines() {
   const { state, total } = useBooking();
   const pkg = PACKAGES.find((p) => p.value === state.packageId);
@@ -37,6 +39,15 @@ function SummaryLines() {
         <div className="flex items-center justify-between py-1.5">
           <p className="text-xs text-gray-400">Premium Booth</p>
           <p className="text-xs text-gray-300">+₱{(1000).toLocaleString()}</p>
+        </div>
+      )}
+
+      {pkg && PROMO_PACKAGES.includes(pkg.value) && (
+        <div className="flex items-center justify-between py-1.5">
+          <p className="text-xs font-medium text-amber-500">
+            Promo: +1 hr if you book today
+          </p>
+          <p className="text-xs text-amber-400">Free</p>
         </div>
       )}
 

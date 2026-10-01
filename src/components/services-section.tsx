@@ -81,8 +81,6 @@ function ServiceDetailsLink({ onClick }: { onClick: () => void }) {
   );
 }
 
-/* ---------- ServiceDetailsModal ---------- */
-
 function ServiceDetailsModal({
   service,
   onClose,
@@ -123,6 +121,12 @@ function ServiceDetailsModal({
             <IconComponent className="h-5 w-5 text-amber-500" />
           </div>
         </div>
+
+        {service.promoLabel && (
+          <span className="mt-3 inline-block rounded-full bg-amber-500/15 px-3 py-1 text-xs font-semibold text-amber-400">
+            🔥 {service.promoLabel}
+          </span>
+        )}
 
         <p className="mt-4 text-sm leading-relaxed text-gray-400">
           {service.description}

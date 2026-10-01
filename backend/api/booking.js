@@ -13,15 +13,17 @@ const transporter = nodemailer.createTransport({
 });
 
 const BACKDROP_LABELS = {
-    solid: "Solid Color",
-    sequin: "Sequin Glam",
-    floral: "Floral Wall",
-};
-
-const DURATION_LABELS = {
-    "2h": "2 Hours",
-    "3h": "3 Hours",
-    "4h": "4 Hours",
+    blue: "Blue",
+    red: "Red",
+    white: "White",
+    pink: "Pink",
+    silver: "Silver",
+    black: "Black",
+    "floral-wall": "Floral Wall",
+    "gold-geometric-black": "Gold Geometric (Black)",
+    "marble-pink": "Marble Pink",
+    "white-grid": "White Grid",
+    "gold-geometric-white": "Gold Geometric (White)",
 };
 
 const PAYMENT_METHOD_LABELS = {
@@ -55,6 +57,7 @@ module.exports = async function handler(req, res) {
         venue,
         guest_count,
         special_requests,
+        dedication_text,
         full_name,
         email,
         phone,
@@ -71,7 +74,7 @@ module.exports = async function handler(req, res) {
     });
 
     const backdropLabel = BACKDROP_LABELS[backdrop] ?? backdrop;
-    const durationLabel = DURATION_LABELS[duration] ?? duration;
+    const durationLabel = duration ? `${parseInt(duration, 10)} Hours` : duration;
     const boothLabel = booth_type === "premium" ? "Premium Booth" : "Classic Booth";
     const paymentLabel = PAYMENT_METHOD_LABELS[payment_method] ?? payment_method;
 
@@ -89,13 +92,14 @@ module.exports = async function handler(req, res) {
                         <h3>Booking Summary</h3>
                         <p><strong>Package:</strong> ${pkg}</p>
                         <p><strong>Booth Type:</strong> ${boothLabel}</p>
-                        <p><strong>Backdrop:</strong> ${backdropLabel}</p>
+                        ${backdrop ? `<p><strong>Backdrop:</strong> ${backdropLabel}</p>` : ''}
                         <p><strong>Duration:</strong> ${durationLabel}</p>
                         <p><strong>Event Date:</strong> ${formattedDate}</p>
                         <p><strong>Start Time:</strong> ${start_time}</p>
                         <p><strong>Event Type:</strong> ${event_type}</p>
                         <p><strong>Venue:</strong> ${venue}</p>
                         ${guest_count ? `<p><strong>Estimated Guests:</strong> ${guest_count}</p>` : ''}
+                        ${dedication_text ? `<p><strong>Dedication / Message:</strong> ${dedication_text}</p>` : ''}
                         ${special_requests ? `<p><strong>Special Requests:</strong> ${special_requests}</p>` : ''}
                         <p><strong>Payment Method:</strong> ${paymentLabel}</p>
                         <p><strong>Total:</strong> ₱${Number(total).toLocaleString()}</p>
@@ -121,13 +125,14 @@ module.exports = async function handler(req, res) {
                         <h3>Booking Details</h3>
                         <p><strong>Package:</strong> ${pkg}</p>
                         <p><strong>Booth Type:</strong> ${boothLabel}</p>
-                        <p><strong>Backdrop:</strong> ${backdropLabel}</p>
+                        ${backdrop ? `<p><strong>Backdrop:</strong> ${backdropLabel}</p>` : ''}
                         <p><strong>Duration:</strong> ${durationLabel}</p>
                         <p><strong>Event Date:</strong> ${formattedDate}</p>
                         <p><strong>Start Time:</strong> ${start_time}</p>
                         <p><strong>Event Type:</strong> ${event_type}</p>
                         <p><strong>Venue:</strong> ${venue}</p>
                         ${guest_count ? `<p><strong>Estimated Guests:</strong> ${guest_count}</p>` : ''}
+                        ${dedication_text ? `<p><strong>Dedication / Message:</strong> ${dedication_text}</p>` : ''}
                         ${special_requests ? `<p><strong>Special Requests:</strong> ${special_requests}</p>` : ''}
                         <p><strong>Payment Method:</strong> ${paymentLabel}</p>
                         <p><strong>Total:</strong> ₱${Number(total).toLocaleString()}</p>

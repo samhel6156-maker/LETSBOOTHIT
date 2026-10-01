@@ -1,4 +1,3 @@
-// src/components/booking/BookingContext.tsx
 import { createContext, useContext, useState, type ReactNode } from "react";
 import { PACKAGES } from "./BookingPage";
 
@@ -15,6 +14,7 @@ type BookingState = {
   venue: string;
   guestCount: string;
   specialRequests: string;
+  dedicationText: string;
   fullName: string;
   email: string;
   phone: string;
@@ -44,6 +44,7 @@ type BookingContextType = {
   setBoothType: (type: BoothType) => void;
   updateEventDetails: (fields: Partial<EventDetailsFields>) => void;
   updateContactDetails: (fields: Partial<ContactDetailsFields>) => void;
+  setDedicationText: (text: string) => void;
   setPaymentMethod: (method: string) => void;
   setConfirmationRef: (ref: string) => void;
   setAgreedToTerms: (agreed: boolean) => void;
@@ -53,17 +54,47 @@ type BookingContextType = {
 
 const BookingContext = createContext<BookingContextType | null>(null);
 
-const BACKDROP_PRICES: Record<string, number> = {
-  solid: 0,
-  sequin: 500,
-  floral: 800,
+// ---- Pricing (shared — imported by PackageDetailPage.tsx and ReviewPage.tsx too) ----
+
+export const DURATION_PRICES: Record<string, Record<string, number>> = {
+  package_1: { "2h": 0, "3h": 1000, "4h": 2000 },
+  package_2: { "2h": 0, "3h": 1500, "4h": 3000 },
+  package_3: { "2h": 0, "3h": 1500, "4h": 3000 },
+  package_4: { "2h": 0, "3h": 1500, "4h": 3000 },
+  package_5: { "2h": 0, "3h": 1500, "4h": 3000 },
+  package_6: { "2h": 0, "3h": 1500, "4h": 3000 },
+  package_7: { "2h": 0, "3h": 1500, "4h": 3000 },
+  package_8: { "2h": 0, "3h": 1500, "4h": 3000 },
+  package_9: { "3h": 0, "4h": 1500, "5h": 3000 },
+  package_10: { "2h": 0, "3h": 1500, "4h": 3000 },
+  package_11: { "2h": 0, "3h": 1500, "4h": 3000 },
+  package_12: { "2h": 0, "3h": 1500, "4h": 3000 },
 };
-const DURATION_PRICES: Record<string, number> = {
-  "2h": 0,
-  "3h": 1500,
-  "4h": 3000,
-};
-const PREMIUM_BOOTH_PRICE = 1000;
+
+export const THREE_HOUR_BASE_PACKAGES = ["package_9"];
+
+export function getBaseHours(packageId: string | null | undefined): number {
+  return packageId && THREE_HOUR_BASE_PACKAGES.includes(packageId) ? 3 : 2;
+}
+
+export function getDurationPrice(
+  packageId: string | null | undefined,
+  duration: string,
+): number {
+  return (DURATION_PRICES[packageId ?? ""] ?? {})[duration] ?? 0;
+}
+
+export function getMaxExtraHours(packageId: string | null | undefined): number {
+  const prices = DURATION_PRICES[packageId ?? ""] ?? {};
+  const hours = Object.keys(prices).map((key) => parseInt(key, 10));
+  if (hours.length === 0) return 0;
+  const base = getBaseHours(packageId);
+  return Math.max(0, Math.max(...hours) - base);
+}
+
+export const PREMIUM_BOOTH_PRICE = 1000;
+
+// ---- Booking state ----
 
 const INITIAL_STATE: BookingState = {
   packageId: null,
@@ -76,6 +107,7 @@ const INITIAL_STATE: BookingState = {
   venue: "",
   guestCount: "",
   specialRequests: "",
+  dedicationText: "",
   fullName: "",
   email: "",
   phone: "",
@@ -88,7 +120,13 @@ export function BookingProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<BookingState>(INITIAL_STATE);
 
   const setPackage = (id: string, backdrop: string, duration: string) =>
-    setState((prev) => ({ ...prev, packageId: id, backdrop, duration }));
+    setState((prev) => ({
+      ...prev,
+      packageId: id,
+      backdrop,
+      duration,
+      boothType: "classic",
+    }));
 
   const setBoothType = (type: BoothType) =>
     setState((prev) => ({ ...prev, boothType: type }));
@@ -98,6 +136,9 @@ export function BookingProvider({ children }: { children: ReactNode }) {
 
   const updateContactDetails = (fields: Partial<ContactDetailsFields>) =>
     setState((prev) => ({ ...prev, ...fields }));
+
+  const setDedicationText = (text: string) =>
+    setState((prev) => ({ ...prev, dedicationText: text }));
 
   const setPaymentMethod = (method: string) =>
     setState((prev) => ({ ...prev, paymentMethod: method }));
@@ -111,10 +152,10 @@ export function BookingProvider({ children }: { children: ReactNode }) {
   const resetBooking = () => setState(INITIAL_STATE);
 
   const pkg = PACKAGES.find((p) => p.value === state.packageId);
+  const durationPrice = getDurationPrice(state.packageId, state.duration);
   const total =
     (pkg?.price ?? 0) +
-    (BACKDROP_PRICES[state.backdrop] ?? 0) +
-    (DURATION_PRICES[state.duration] ?? 0) +
+    durationPrice +
     (state.boothType === "premium" ? PREMIUM_BOOTH_PRICE : 0);
 
   return (
@@ -125,6 +166,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
         setBoothType,
         updateEventDetails,
         updateContactDetails,
+        setDedicationText,
         setPaymentMethod,
         setConfirmationRef,
         setAgreedToTerms,

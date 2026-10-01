@@ -4,7 +4,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PACKAGES } from "./BookingPage";
-import { useBooking } from "./BookingContext";
+import {
+  useBooking,
+  getBaseHours,
+  getDurationPrice,
+  getMaxExtraHours,
+  PREMIUM_BOOTH_PRICE,
+} from "./BookingContext";
 import BoothSelectionPage from "./BoothSelectionPage";
 import { BackdropCard } from "./BackdropCard";
 
@@ -14,6 +20,31 @@ type BackdropOption = {
   price: number;
   available: boolean;
   image: string;
+};
+
+const PACKAGE_DESCRIPTIONS: Record<string, string> = {
+  package_1:
+    "4 × 6 in photo prints with a cardboard standee frame, perfect for displaying your favorite moments.",
+  package_2:
+    "4 × 6 in photo prints with a 1mm magnetic backing, ready to display on any magnetic surface.",
+  package_3:
+    "2 × 6 in strip photo prints with a 1mm magnetic backing, with optional personalized dedication text.",
+  package_4:
+    "2 × 6 in strip photo prints with a cardboard standee frame, with optional personalized dedication text.",
+  package_5: "4 × 3 in Polaroid prints with a cardboard standee frame.",
+  package_6: "4 × 3 in Polaroid prints with a 1mm magnetic backing.",
+  package_7:
+    "Choose a 25 × 76 mm keychain with Polaroid Photo Prints or 44 × 70 mm keychain with strip Photo Prints. Both come with magnetic prints.",
+  package_8:
+    "An interactive mirror booth that lets guests choose from different photo layouts, including 4R, Strips and Polaroid prints. Add keychain prints for an additional charge. Your photos come as magnetic prints, perfect for displaying on your fridge or any magnetic surface.",
+  package_9:
+    "Capture 360° videos as our camera rotates around you and your guests on a stationary platform. Each session can accommodate up to 4 guests.",
+  package_10:
+    "Capture stylish, wide-angle photos from above—perfect for creative poses, group shots, and fun, share-worthy moments. Framed by elegant, heavy red curtain walls, it adds a dramatic yet timeless touch to every shot.",
+  package_11:
+    "A 7 × 7 ft photo booth that turns your photos into personalized magazine covers.",
+  package_12:
+    "A professional roaming photo booth experience that brings the camera directly to your guests. Our Photoman captures candid, engaging moments throughout your event, with each session producing 4 × 6-inch photo prints presented in a cardboard standee frame—a fun and memorable keepsake your guests can take home and display.",
 };
 
 const CLASSIC_BACKDROP_OPTIONS: BackdropOption[] = [
@@ -34,32 +65,32 @@ const CLASSIC_BACKDROP_OPTIONS: BackdropOption[] = [
       "/Photobooth photos/Lets Booth it Photos/classic backdrop/34A6F23F-A0A1-4233-A4E5-814C9EF96E7D.png",
   },
   {
-    value: "white-sparkle",
-    label: "White Sparkle",
+    value: "white",
+    label: "White",
     price: 0,
     available: true,
     image:
       "/Photobooth photos/Lets Booth it Photos/classic backdrop/B594E08D-0244-4FA8-9A47-04B62C21E8FE.png",
   },
   {
-    value: "pink-sequin",
-    label: "Pink Sequin",
+    value: "pink",
+    label: "Pink",
     price: 0,
     available: true,
     image:
       "/Photobooth photos/Lets Booth it Photos/classic backdrop/BCBE293C-0568-40ED-91B3-9E2A25683E0B.png",
   },
   {
-    value: "silver-sequin",
-    label: "Silver Sequin",
+    value: "silver",
+    label: "Silver",
     price: 0,
     available: true,
     image:
       "/Photobooth photos/Lets Booth it Photos/classic backdrop/E50A2B39-5858-476A-BB76-590795C2F3C6.png",
   },
   {
-    value: "black-sequin",
-    label: "Black Sequin",
+    value: "black",
+    label: "Black",
     price: 0,
     available: true,
     image:
@@ -110,28 +141,38 @@ const PREMIUM_BACKDROP_OPTIONS: BackdropOption[] = [
   },
 ];
 
+// Mirror Booth, 360° Video Booth, High Angle, Magazine Booth, Photoman —
+// no Classic/Premium booth-type choice for these specialty setups.
 const NO_BOOTH_SELECTION = [
-  "package_7",
   "package_8",
   "package_9",
   "package_10",
+  "package_11",
+  "package_12",
 ];
+
+// 360° Video Booth, Magazine Booth, Photoman only — Mirror Booth and
+// High Angle still offer a backdrop choice.
+const NO_BACKDROP_SELECTION = ["package_9", "package_11", "package_12"];
+
+// Strip Magnetic and Strip Standee — offer an optional dedication/message add-on.
+const DEDICATION_PACKAGES = ["package_3", "package_4"];
 
 function DurationStepper({
   extraHours,
   onChange,
-  pricePerHour = 1500,
   baseHours = 2,
+  packageId,
   maxExtraHours = 4,
 }: {
   extraHours: number;
   onChange: (value: number) => void;
-  pricePerHour?: number;
   baseHours?: number;
+  packageId: string;
   maxExtraHours?: number;
 }) {
   const totalHours = baseHours + extraHours;
-  const extraCost = extraHours * pricePerHour;
+  const extraCost = getDurationPrice(packageId, `${totalHours}h`);
 
   return (
     <div className="mt-5 rounded-2xl border border-white/8 bg-[#201f1c] p-5">
@@ -148,7 +189,7 @@ function DurationStepper({
           <p className="mt-0.5 text-xs text-gray-500">
             {extraHours === 0
               ? "Included"
-              : `+${extraHours}h · +₱${extraCost.toLocaleString()}`}
+              : `+${extraHours}hours · +₱${extraCost.toLocaleString()}`}
           </p>
         </div>
 
@@ -191,7 +232,7 @@ function DurationStepper({
 export default function PackageDetailPage() {
   const { packageId } = useParams<{ packageId: string }>();
   const navigate = useNavigate();
-  const { state, setPackage } = useBooking();
+  const { state, setPackage, setBoothType, setDedicationText } = useBooking();
   const pkg = PACKAGES.find((p) => p.value === packageId);
 
   const BACKDROP_OPTIONS =
@@ -201,18 +242,28 @@ export default function PackageDetailPage() {
 
   const [backdrop, setBackdrop] = useState(BACKDROP_OPTIONS[0].value);
   const [extraHours, setExtraHours] = useState(0);
+  const [dedicationEnabled, setDedicationEnabled] = useState(false);
+
+  useEffect(() => {
+    setBoothType("classic");
+  }, [packageId]);
 
   useEffect(() => {
     setBackdrop(BACKDROP_OPTIONS[0].value);
   }, [state.boothType]);
 
+  const baseHours = getBaseHours(pkg?.value);
+  const duration = `${baseHours + extraHours}h`;
+
   const total = useMemo(() => {
     if (!pkg) return 0;
-    const backdropPrice =
-      BACKDROP_OPTIONS.find((o) => o.value === backdrop)?.price ?? 0;
-    const durationPrice = extraHours * 1500;
-    return pkg.price + backdropPrice + durationPrice;
-  }, [pkg, backdrop, extraHours, BACKDROP_OPTIONS]);
+    const backdropPrice = NO_BACKDROP_SELECTION.includes(pkg.value)
+      ? 0
+      : (BACKDROP_OPTIONS.find((o) => o.value === backdrop)?.price ?? 0);
+    const boothPrice = state.boothType === "premium" ? PREMIUM_BOOTH_PRICE : 0;
+    const durationPrice = getDurationPrice(pkg.value, duration);
+    return pkg.price + backdropPrice + boothPrice + durationPrice;
+  }, [pkg, backdrop, duration, BACKDROP_OPTIONS, state.boothType]);
 
   if (!pkg) {
     return (
@@ -242,7 +293,6 @@ export default function PackageDetailPage() {
       </div>
 
       <div className="mx-auto max-w-[1152px] px-0 py-8 sm:px-6">
-        {/* Hero image + title/price/description as ONE card — full-bleed on mobile, rounded/contained from sm up */}
         <div className="overflow-hidden border border-white/10 sm:rounded-2xl">
           <div className="relative aspect-[16/9] w-full sm:aspect-[16/7]">
             <img
@@ -275,9 +325,7 @@ export default function PackageDetailPage() {
               </div>
             </div>
             <p className="mt-3 text-sm leading-relaxed text-gray-400">
-              Our signature enclosed booth experience with a sleek setup and
-              premium lighting. Perfect for intimate gatherings, formal events,
-              and anywhere you want a classic photobooth vibe.
+              {PACKAGE_DESCRIPTIONS[pkg.value] ?? pkg.name}
             </p>
           </div>
         </div>
@@ -289,37 +337,102 @@ export default function PackageDetailPage() {
         )}
 
         <div className="px-4 sm:px-0">
-          {/* Backdrop Style */}
-          <div className="mt-5 rounded-2xl border border-white/8 bg-[#201f1c] p-5">
-            <div className="flex items-center justify-between">
-              <h3 className="text-base font-semibold text-white">
-                Backdrop Style
-              </h3>
-              <span className="rounded-full bg-white/8 px-2.5 py-1 text-xs text-gray-500">
-                Choose one
-              </span>
+          {!NO_BACKDROP_SELECTION.includes(pkg.value) && (
+            <div className="mt-5 rounded-2xl border border-white/8 bg-[#201f1c] p-5">
+              <div className="flex items-center justify-between">
+                <h3 className="text-base font-semibold text-white">
+                  Backdrop Style
+                </h3>
+                <span className="rounded-full bg-white/8 px-2.5 py-1 text-xs text-gray-500">
+                  Choose one
+                </span>
+              </div>
+              <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                {BACKDROP_OPTIONS.map((opt) => (
+                  <BackdropCard
+                    key={opt.value}
+                    image={opt.image}
+                    label={opt.label}
+                    priceLabel={
+                      opt.price === 0
+                        ? "Included"
+                        : `+₱${opt.price.toLocaleString()}`
+                    }
+                    selected={backdrop === opt.value}
+                    disabled={!opt.available}
+                    onSelect={() => setBackdrop(opt.value)}
+                  />
+                ))}
+              </div>
             </div>
-            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
-              {BACKDROP_OPTIONS.map((opt) => (
-                <BackdropCard
-                  key={opt.value}
-                  image={opt.image}
-                  label={opt.label}
-                  priceLabel={
-                    opt.price === 0
-                      ? "Included"
-                      : `+₱${opt.price.toLocaleString()}`
-                  }
-                  selected={backdrop === opt.value}
-                  disabled={!opt.available}
-                  onSelect={() => setBackdrop(opt.value)}
-                />
-              ))}
-            </div>
-          </div>
+          )}
 
-          {/* Session Duration */}
-          <DurationStepper extraHours={extraHours} onChange={setExtraHours} />
+          {DEDICATION_PACKAGES.includes(pkg.value) && (
+            <div className="mt-5 rounded-2xl border border-white/8 bg-[#201f1c] p-5">
+              <button
+                type="button"
+                onClick={() => {
+                  setDedicationEnabled((prev) => !prev);
+                  if (dedicationEnabled) setDedicationText("");
+                }}
+                className={cn(
+                  "flex w-full items-center justify-between rounded-xl border px-4 py-3.5 text-left transition-colors",
+                  dedicationEnabled
+                    ? "border-amber-600/60 bg-amber-500/10"
+                    : "border-white/10 bg-[#2a2926] hover:border-white/20",
+                )}
+              >
+                <div className="flex items-center gap-3">
+                  <span
+                    className={cn(
+                      "flex size-4 shrink-0 items-center justify-center rounded-full border-[1.6px]",
+                      dedicationEnabled
+                        ? "border-amber-500 bg-amber-500"
+                        : "border-white/30",
+                    )}
+                  >
+                    {dedicationEnabled && (
+                      <span className="size-1.5 rounded-full bg-black" />
+                    )}
+                  </span>
+                  <div className="flex flex-col">
+                    <span
+                      className={cn(
+                        "text-sm font-medium",
+                        dedicationEnabled ? "text-white" : "text-gray-300",
+                      )}
+                    >
+                      Dedication / Message
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      Add a personalized message to your prints
+                    </span>
+                  </div>
+                </div>
+                <span className="text-sm font-semibold text-gray-500">
+                  Free
+                </span>
+              </button>
+
+              {dedicationEnabled && (
+                <textarea
+                  value={state.dedicationText}
+                  onChange={(e) => setDedicationText(e.target.value)}
+                  placeholder="e.g. Happy 18th Birthday, Sarah!"
+                  rows={3}
+                  className="mt-3 w-full rounded-xl border border-white/10 bg-[#2a2926] px-4 py-3 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-amber-500/50 focus:ring-2 focus:ring-amber-500/50"
+                />
+              )}
+            </div>
+          )}
+
+          <DurationStepper
+            extraHours={extraHours}
+            onChange={setExtraHours}
+            baseHours={baseHours}
+            packageId={pkg.value}
+            maxExtraHours={getMaxExtraHours(pkg.value)}
+          />
         </div>
       </div>
 
@@ -336,7 +449,7 @@ export default function PackageDetailPage() {
           </div>
           <button
             onClick={() => {
-              setPackage(pkg.value, backdrop, `${2 + extraHours}h`);
+              setPackage(pkg.value, backdrop, duration);
               navigate("/booking/event");
             }}
             className="flex-1 rounded-full bg-amber-500 py-4 text-base font-bold text-black hover:bg-amber-400 transition-colors"

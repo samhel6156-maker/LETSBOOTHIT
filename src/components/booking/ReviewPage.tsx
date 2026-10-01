@@ -16,23 +16,29 @@ import {
   Landmark,
 } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useBooking } from "./BookingContext";
+import {
+  useBooking,
+  getBaseHours,
+  getDurationPrice,
+  PREMIUM_BOOTH_PRICE,
+} from "./BookingContext";
 import { StepProgress } from "./StepProgress";
 import { PACKAGES } from "./BookingPage";
 import { TermsDialog } from "./TermsDialog";
 
 const BACKDROP_LABELS: Record<string, string> = {
-  solid: "Solid Color",
-  sequin: "Sequin Glam",
-  floral: "Floral Wall",
-};
-
-const DURATION_LABELS: Record<string, string> = {
-  "2h": "2 Hours",
-  "3h": "3 Hours",
-  "4h": "4 Hours",
+  blue: "Blue",
+  red: "Red",
+  white: "White",
+  pink: "Pink",
+  silver: "Silver",
+  black: "Black",
+  "floral-wall": "Floral Wall",
+  "gold-geometric-black": "Gold Geometric (Black)",
+  "marble-pink": "Marble Pink",
+  "white-grid": "White Grid",
+  "gold-geometric-white": "Gold Geometric (White)",
 };
 
 const PAYMENT_METHODS = [
@@ -45,13 +51,6 @@ const PAYMENT_METHODS = [
   { value: "maribank", label: "Maribank", icon: Landmark },
   { value: "landbank", label: "Landbank", icon: Landmark },
 ];
-
-function BACKDROP_PRICE(value: string) {
-  return { solid: 0, sequin: 500, floral: 800 }[value] ?? 0;
-}
-function DURATION_PRICE(value: string) {
-  return { "2h": 0, "3h": 1500, "4h": 3000 }[value] ?? 0;
-}
 
 function InfoRow({
   icon,
@@ -125,6 +124,18 @@ function maskPhone(phone: string) {
   return phone.slice(0, 2) + "*".repeat(Math.max(phone.length - 2, 0));
 }
 
+function addHoursToTime(time: string, hours: number): string {
+  if (!time) return "";
+  const [h, m] = time.split(":").map(Number);
+  const totalMinutes = h * 60 + m + hours * 60;
+  const normalized = ((totalMinutes % (24 * 60)) + 24 * 60) % (24 * 60);
+  const endH = Math.floor(normalized / 60);
+  const endM = normalized % 60;
+  const period = endH >= 12 ? "PM" : "AM";
+  const displayH = endH % 12 === 0 ? 12 : endH % 12;
+  return `${displayH}:${String(endM).padStart(2, "0")} ${period}`;
+}
+
 export default function ReviewPage() {
   const navigate = useNavigate();
   const {
@@ -146,6 +157,11 @@ export default function ReviewPage() {
 
   const boothLabel =
     state.boothType === "premium" ? "Premium Booth" : "Classic Booth";
+
+  const totalHours = parseInt(state.duration, 10) || 0;
+  const endTime = addHoursToTime(state.startTime, totalHours);
+  const baseHours = getBaseHours(pkg.value);
+  const durationPrice = getDurationPrice(pkg.value, state.duration);
 
   const handleSubmit = async () => {
     if (!state.paymentMethod) {
@@ -176,6 +192,7 @@ export default function ReviewPage() {
           venue: state.venue,
           guest_count: state.guestCount,
           special_requests: state.specialRequests,
+          dedication_text: state.dedicationText,
           full_name: state.fullName,
           email: state.email,
           phone: state.phone,
@@ -269,29 +286,27 @@ export default function ReviewPage() {
                   {boothLabel}
                 </span>
                 <span className="text-base font-semibold text-white">
-                  ₱{pkg.price.toLocaleString()}
+                  {state.boothType === "premium"
+                    ? `+₱${PREMIUM_BOOTH_PRICE.toLocaleString()}`
+                    : "Included"}
                 </span>
               </div>
+              {BACKDROP_LABELS[state.backdrop] && (
+                <div className="mt-2 flex items-center justify-between">
+                  <span className="text-sm text-gray-400">
+                    {BACKDROP_LABELS[state.backdrop]} Backdrop Style
+                  </span>
+                  <span className="text-sm text-gray-300">Included</span>
+                </div>
+              )}
               <div className="mt-2 flex items-center justify-between">
                 <span className="text-sm text-gray-400">
-                  {BACKDROP_LABELS[state.backdrop] ?? state.backdrop} Backdrop
-                  Style
+                  {totalHours} Hours Session Duration
                 </span>
                 <span className="text-sm text-gray-300">
-                  {state.backdrop === "solid"
+                  {totalHours === baseHours
                     ? "Included"
-                    : `+₱${BACKDROP_PRICE(state.backdrop).toLocaleString()}`}
-                </span>
-              </div>
-              <div className="mt-2 flex items-center justify-between">
-                <span className="text-sm text-gray-400">
-                  {DURATION_LABELS[state.duration] ?? state.duration} Session
-                  Duration
-                </span>
-                <span className="text-sm text-gray-300">
-                  {state.duration === "2h"
-                    ? "Included"
-                    : `+₱${DURATION_PRICE(state.duration).toLocaleString()}`}
+                    : `+₱${durationPrice.toLocaleString()}`}
                 </span>
               </div>
             </div>
@@ -319,6 +334,11 @@ export default function ReviewPage() {
                 value={state.startTime}
               />
               <InfoRow
+                icon={<Clock className="size-3.5" />}
+                label="End Time"
+                value={endTime}
+              />
+              <InfoRow
                 icon={<Users className="size-3.5" />}
                 label="Event Type"
                 value={state.eventType}
@@ -336,6 +356,16 @@ export default function ReviewPage() {
                 />
               )}
             </div>
+            {state.dedicationText && (
+              <div className="mt-4 border-t border-white/8 pt-4">
+                <p className="mb-2 text-[11px] uppercase tracking-wide text-gray-500">
+                  Dedication / Message
+                </p>
+                <p className="text-sm leading-relaxed text-gray-300">
+                  {state.dedicationText}
+                </p>
+              </div>
+            )}
             {state.specialRequests && (
               <div className="mt-4 border-t border-white/8 pt-4">
                 <p className="mb-2 text-[11px] uppercase tracking-wide text-gray-500">

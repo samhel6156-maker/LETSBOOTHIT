@@ -26,6 +26,14 @@ function FieldError({ show, message }: { show: boolean; message: string }) {
   return <p className="mt-1.5 text-xs text-red-400">{message}</p>;
 }
 
+function getTodayLocal(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 export default function EventDetailsPage() {
   const navigate = useNavigate();
   const { state, updateEventDetails } = useBooking();
@@ -38,8 +46,13 @@ export default function EventDetailsPage() {
 
   if (!pkg) return null;
 
+  const today = getTodayLocal();
   const errors = {
-    eventDate: !state.eventDate ? "Please select an event date." : "",
+    eventDate: !state.eventDate
+      ? "Please select an event date."
+      : state.eventDate < today
+        ? "Please select today or a future date."
+        : "",
     startTime: !state.startTime ? "Please choose a start time." : "",
     eventType: !state.eventType ? "Please select an event type." : "",
     venue: !state.venue.trim() ? "Please enter your venue or address." : "",
@@ -123,7 +136,7 @@ export default function EventDetailsPage() {
                     id="event-date"
                     type="date"
                     value={state.eventDate}
-                    min={new Date().toISOString().split("T")[0]}
+                    min={today}
                     onChange={(e) =>
                       updateEventDetails({ eventDate: e.target.value })
                     }

@@ -25,6 +25,7 @@ export type ServiceItem = {
     price: string;
     description: string;
   }[];
+  promoLabel?: string;
 };
 
 export const services: ServiceItem[] = [
@@ -109,6 +110,7 @@ export const services: ServiceItem[] = [
       "AirDrop available for iPhone users",
       "Free Transportation within Quezon City ",
     ],
+    promoLabel: "+1 hr if you book today",
     images: [
       {
         src: "/Photobooth photos/Lets Booth it Photos/Photobooth setups/360 Video Booth.png",
@@ -124,7 +126,7 @@ export const services: ServiceItem[] = [
       },
     ],
     price: "₱10,000",
-    duration: "3 hours",
+    duration: "2 hours",
     extraHour: "+₱2,000",
   },
   {
@@ -178,6 +180,7 @@ export const services: ServiceItem[] = [
       "Red carpet with Stanchions",
       "Free Transportation within Quezon City ",
     ],
+    promoLabel: "+1 hr if you book today",
     images: [
       {
         src: "/Photobooth photos/Lets Booth it Photos/Photobooth setups/Mirror Booth.png",
@@ -209,6 +212,7 @@ export const services: ServiceItem[] = [
       "Fun Props",
       "Free transportation within QC ",
     ],
+    promoLabel: "+1 hr if you book today",
     addOns: [
       {
         label: "Photographer",

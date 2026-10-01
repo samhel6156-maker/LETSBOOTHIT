@@ -22,13 +22,20 @@ export const PACKAGES = [
   },
   {
     value: "package_3",
-    name: "4R Strip/Dedication",
-    price: 2700,
+    name: "Strip Magnetic",
+    price: 3700,
     image: "/Photobooth photos/Lets Booth it Photos/Packages/Strip Standee.png",
     badge: null,
   },
   {
     value: "package_4",
+    name: "Strip Standee",
+    price: 2700,
+    image: "/Photobooth photos/Lets Booth it Photos/Packages/Strip Standee.png",
+    badge: null,
+  },
+  {
+    value: "package_5",
     name: "Polaroid Standee",
     price: 4500,
     image:
@@ -36,7 +43,15 @@ export const PACKAGES = [
     badge: null,
   },
   {
-    value: "package_5",
+    value: "package_6",
+    name: "Polaroid Magnetic",
+    price: 4500,
+    image:
+      "/Photobooth photos/Lets Booth it Photos/Packages/Polaroid Magnetic.png",
+    badge: null,
+  },
+  {
+    value: "package_7",
     name: "Keychain",
     price: 5000,
     image:
@@ -44,7 +59,7 @@ export const PACKAGES = [
     badge: null,
   },
   {
-    value: "package_6",
+    value: "package_8",
     name: "Mirror Booth",
     price: 10000,
     image:
@@ -52,7 +67,7 @@ export const PACKAGES = [
     badge: "Popular",
   },
   {
-    value: "package_7",
+    value: "package_9",
     name: "360° Video Booth",
     price: 10000,
     image:
@@ -60,14 +75,14 @@ export const PACKAGES = [
     badge: "Popular",
   },
   {
-    value: "package_8",
+    value: "package_10",
     name: "High Angle",
     price: 10000,
     image: "/Photobooth photos/Lets Booth it Photos/Packages/High Angle.png",
     badge: "Popular",
   },
   {
-    value: "package_9",
+    value: "package_11",
     name: "Magazine Booth",
     price: 10000,
     image:
@@ -75,7 +90,7 @@ export const PACKAGES = [
     badge: "Popular",
   },
   {
-    value: "package_10",
+    value: "package_12",
     name: "Photoman",
     price: 5000,
     image: "/Photobooth photos/Lets Booth it Photos/Packages/Photoman.png",
