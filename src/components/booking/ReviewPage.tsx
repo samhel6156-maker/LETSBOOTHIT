@@ -1,0 +1,503 @@
+// src/components/booking/ReviewPage.tsx
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  ArrowLeft,
+  Calendar,
+  Clock,
+  User,
+  MapPin,
+  Mail,
+  Phone,
+  Sparkles,
+  Users,
+  Banknote,
+  Wallet,
+  Landmark,
+} from "lucide-react";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+import {
+  useBooking,
+  getBaseHours,
+  getDurationPrice,
+  PREMIUM_BOOTH_PRICE,
+} from "./BookingContext";
+import { StepProgress } from "./StepProgress";
+import { PACKAGES } from "./BookingPage";
+import { TermsDialog } from "./TermsDialog";
+
+const BACKDROP_LABELS: Record<string, string> = {
+  blue: "Blue",
+  red: "Red",
+  white: "White",
+  pink: "Pink",
+  silver: "Silver",
+  black: "Black",
+  "floral-wall": "Floral Wall",
+  "gold-geometric-black": "Gold Geometric (Black)",
+  "marble-pink": "Marble Pink",
+  "white-grid": "White Grid",
+  "gold-geometric-white": "Gold Geometric (White)",
+};
+
+const PAYMENT_METHODS = [
+  { value: "cash", label: "Cash", icon: Banknote },
+  { value: "paymaya", label: "PayMaya", icon: Wallet },
+  { value: "gcash", label: "GCash", icon: Wallet },
+  { value: "bpi", label: "BPI", icon: Landmark },
+  { value: "unionbank", label: "UnionBank", icon: Landmark },
+  { value: "bdo", label: "BDO", icon: Landmark },
+  { value: "maribank", label: "Maribank", icon: Landmark },
+  { value: "landbank", label: "Landbank", icon: Landmark },
+];
+
+const PROMO_PACKAGES = ["package_8", "package_9", "package_11"];
+
+function InfoRow({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}) {
+  if (!value) return null;
+  return (
+    <div className="flex items-start gap-3">
+      <div className="mt-0.5 shrink-0 rounded-lg bg-white/6 p-1.5 text-gray-400">
+        {icon}
+      </div>
+      <div>
+        <p className="text-[11px] uppercase tracking-wide text-gray-500">
+          {label}
+        </p>
+        <p className="mt-0.5 text-sm font-medium text-white">{value}</p>
+      </div>
+    </div>
+  );
+}
+
+function PaymentMethodCard({
+  label,
+  icon: Icon,
+  selected,
+  onSelect,
+}: {
+  label: string;
+  icon: React.ElementType;
+  selected: boolean;
+  onSelect: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className={cn(
+        "flex flex-col items-center gap-2 rounded-xl border p-3 transition-colors",
+        selected
+          ? "border-amber-500/60 bg-amber-500/10"
+          : "border-white/10 bg-[#2a2926] hover:border-white/20",
+      )}
+    >
+      <div className="flex h-10 w-full items-center justify-center">
+        <Icon
+          className={cn(
+            "size-6",
+            selected ? "text-amber-400" : "text-gray-400",
+          )}
+        />
+      </div>
+      <span
+        className={cn(
+          "text-xs font-medium",
+          selected ? "text-white" : "text-gray-400",
+        )}
+      >
+        {label}
+      </span>
+    </button>
+  );
+}
+
+function maskPhone(phone: string) {
+  if (phone.length <= 2) return phone;
+  return phone.slice(0, 2) + "*".repeat(Math.max(phone.length - 2, 0));
+}
+
+function addHoursToTime(time: string, hours: number): string {
+  if (!time) return "";
+  const [h, m] = time.split(":").map(Number);
+  const totalMinutes = h * 60 + m + hours * 60;
+  const normalized = ((totalMinutes % (24 * 60)) + 24 * 60) % (24 * 60);
+  const endH = Math.floor(normalized / 60);
+  const endM = normalized % 60;
+  const period = endH >= 12 ? "PM" : "AM";
+  const displayH = endH % 12 === 0 ? 12 : endH % 12;
+  return `${displayH}:${String(endM).padStart(2, "0")} ${period}`;
+}
+
+export default function ReviewPage() {
+  const navigate = useNavigate();
+  const {
+    state,
+    total,
+    setConfirmationRef,
+    setAgreedToTerms,
+    setPaymentMethod,
+  } = useBooking();
+  const pkg = PACKAGES.find((p) => p.value === state.packageId);
+  const [submitting, setSubmitting] = useState(false);
+  const [termsOpen, setTermsOpen] = useState(false);
+
+  useEffect(() => {
+    if (!pkg) navigate("/booking");
+  }, [pkg, navigate]);
+
+  if (!pkg) return null;
+
+  const boothLabel =
+    state.boothType === "premium" ? "Premium Booth" : "Classic Booth";
+
+  const totalHours = parseInt(state.duration, 10) || 0;
+  const promoBonusHour = PROMO_PACKAGES.includes(pkg.value) ? 1 : 0;
+  const displayHours = totalHours + promoBonusHour;
+  const endTime = addHoursToTime(state.startTime, displayHours);
+  const baseHours = getBaseHours(pkg.value);
+  const durationPrice = getDurationPrice(pkg.value, state.duration);
+
+  const handleSubmit = async () => {
+    if (!state.paymentMethod) {
+      toast.error("Please select a payment method.");
+      return;
+    }
+    if (!state.agreedToTerms) {
+      toast.error("Please agree to the Terms and Conditions to continue.");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/booking`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          package: pkg.value,
+          booth_type: state.boothType,
+          backdrop: state.backdrop,
+          duration: state.duration,
+          event_date: state.eventDate,
+          start_time: state.startTime,
+          event_type: state.eventType,
+          venue: state.venue,
+          guest_count: state.guestCount,
+          special_requests: state.specialRequests,
+          dedication_text: state.dedicationText,
+          full_name: state.fullName,
+          email: state.email,
+          phone: state.phone,
+          payment_method: state.paymentMethod,
+          total,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setConfirmationRef(
+          data.reference ?? `LBI-${Date.now().toString().slice(-6)}`,
+        );
+        navigate("/booking/confirmation");
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
+    } catch {
+      toast.error(
+        "Cannot connect to server. Please check if backend is running.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#1b1b18] pb-24 lg:pb-16">
+      <div className="sticky top-0 z-20 border-b border-white/8 bg-[#1b1b18]/95 backdrop-blur-sm">
+        <div className="mx-auto flex h-14 max-w-[1152px] items-center justify-between px-6">
+          <button
+            onClick={() => navigate("/")}
+            className="flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-white"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span className="hidden sm:inline">Back to Home</span>
+          </button>
+          <p className="font-serif text-lg italic font-bold text-white">
+            Let&apos;s <span className="text-amber-500">Booth</span> It
+          </p>
+          <div className="w-[112px]" />
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-[1152px] px-6 py-8">
+        <div className="flex items-center justify-between rounded-2xl border border-white/8 bg-[#201f1c] px-4 py-3">
+          <div className="flex items-center gap-3">
+            <img
+              src={pkg.image}
+              alt={pkg.name}
+              className="size-10 rounded-xl object-cover"
+            />
+            <div>
+              <p className="text-[11px] uppercase tracking-wide text-gray-500">
+                Selected Package
+              </p>
+              <p className="font-serif text-sm italic font-semibold text-white">
+                {pkg.name}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => navigate(`/booking/package/${pkg.value}`)}
+            className="rounded-lg px-3 py-1.5 text-xs font-semibold text-amber-500 hover:bg-white/5"
+          >
+            Change
+          </button>
+        </div>
+
+        <div className="mx-auto mt-6 max-w-[744px]">
+          <StepProgress currentStep={4} />
+
+          <p className="mt-2 text-xs font-semibold uppercase tracking-[0.15em] text-amber-500">
+            Step 5 of 5
+          </p>
+          <h1 className="mt-1 font-serif text-3xl italic text-white">
+            Review your booking.
+          </h1>
+          <p className="mt-2 max-w-lg text-sm text-gray-500">
+            Everything look right? Submit your request and we&apos;ll confirm
+            within 24 hours.
+          </p>
+
+          <div className="mt-6 overflow-hidden rounded-2xl border border-white/8 bg-[#201f1c]">
+            <div className="border-b border-white/8 p-5">
+              <p className="mb-3 text-[11px] uppercase tracking-wide text-gray-500">
+                Package
+              </p>
+              <div className="flex items-center justify-between">
+                <span className="font-serif text-base italic font-bold text-white">
+                  {boothLabel}
+                </span>
+                <span className="text-base font-semibold text-white">
+                  {state.boothType === "premium"
+                    ? `+₱${PREMIUM_BOOTH_PRICE.toLocaleString()}`
+                    : "Included"}
+                </span>
+              </div>
+              {BACKDROP_LABELS[state.backdrop] && (
+                <div className="mt-2 flex items-center justify-between">
+                  <span className="text-sm text-gray-400">
+                    {BACKDROP_LABELS[state.backdrop]} Backdrop Style
+                  </span>
+                  <span className="text-sm text-gray-300">Included</span>
+                </div>
+              )}
+              <div className="mt-2 flex items-center justify-between">
+                <span className="text-sm text-gray-400">
+                  {displayHours} Hours Session Duration
+                  {promoBonusHour > 0 && (
+                    <span className="ml-1 text-amber-500">(+1 hr promo)</span>
+                  )}
+                </span>
+                <span className="text-sm text-gray-300">
+                  {totalHours === baseHours
+                    ? "Included"
+                    : `+₱${durationPrice.toLocaleString()}`}
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center justify-between bg-amber-500/5 p-5">
+              <span className="text-lg font-bold text-white">Total</span>
+              <span className="text-2xl font-bold text-amber-400">
+                ₱{total.toLocaleString()}
+              </span>
+            </div>
+          </div>
+
+          <div className="mt-6 rounded-2xl border border-white/8 bg-[#201f1c] p-5">
+            <p className="mb-4 text-[11px] uppercase tracking-wide text-gray-500">
+              Event Details
+            </p>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <InfoRow
+                icon={<Calendar className="size-3.5" />}
+                label="Date"
+                value={state.eventDate}
+              />
+              <InfoRow
+                icon={<Clock className="size-3.5" />}
+                label="Start Time"
+                value={state.startTime}
+              />
+              <InfoRow
+                icon={<Clock className="size-3.5" />}
+                label="End Time"
+                value={endTime}
+              />
+              <InfoRow
+                icon={<Users className="size-3.5" />}
+                label="Event Type"
+                value={state.eventType}
+              />
+              <InfoRow
+                icon={<MapPin className="size-3.5" />}
+                label="Venue"
+                value={state.venue}
+              />
+              {state.guestCount && (
+                <InfoRow
+                  icon={<Users className="size-3.5" />}
+                  label="Estimated Guests"
+                  value={`${state.guestCount} guests`}
+                />
+              )}
+            </div>
+            {state.dedicationText && (
+              <div className="mt-4 border-t border-white/8 pt-4">
+                <p className="mb-2 text-[11px] uppercase tracking-wide text-gray-500">
+                  Dedication / Message
+                </p>
+                <p className="text-sm leading-relaxed text-gray-300">
+                  {state.dedicationText}
+                </p>
+              </div>
+            )}
+            {state.specialRequests && (
+              <div className="mt-4 border-t border-white/8 pt-4">
+                <p className="mb-2 text-[11px] uppercase tracking-wide text-gray-500">
+                  Special Requests
+                </p>
+                <p className="text-sm leading-relaxed text-gray-300">
+                  {state.specialRequests}
+                </p>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-6 rounded-2xl border border-white/8 bg-[#201f1c] p-5">
+            <p className="mb-4 text-[11px] uppercase tracking-wide text-gray-500">
+              Contact Details
+            </p>
+            <div className="flex flex-col gap-4">
+              <InfoRow
+                icon={<User className="size-3.5" />}
+                label="Name"
+                value={state.fullName}
+              />
+              <InfoRow
+                icon={<Mail className="size-3.5" />}
+                label="Email"
+                value={state.email}
+              />
+              <InfoRow
+                icon={<Phone className="size-3.5" />}
+                label="Phone"
+                value={maskPhone(state.phone)}
+              />
+            </div>
+          </div>
+
+          {/* Payment Method */}
+          <div className="mt-6 rounded-2xl border border-white/8 bg-[#201f1c] p-5">
+            <p className="mb-3 text-[11px] uppercase tracking-wide text-gray-500">
+              Payment Method *
+            </p>
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+              {PAYMENT_METHODS.map((method) => (
+                <PaymentMethodCard
+                  key={method.value}
+                  label={method.label}
+                  icon={method.icon}
+                  selected={state.paymentMethod === method.value}
+                  onSelect={() => setPaymentMethod(method.value)}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-6 flex items-start gap-3 rounded-2xl border border-white/8 bg-[#201f1c] p-4">
+            <button
+              type="button"
+              onClick={() => !state.agreedToTerms && setTermsOpen(true)}
+              className={`mt-0.5 flex size-5 shrink-0 items-center justify-center rounded border ${
+                state.agreedToTerms
+                  ? "border-amber-500 bg-amber-500"
+                  : "border-white/20"
+              }`}
+              aria-label="Agree to Terms and Conditions"
+            >
+              {state.agreedToTerms && (
+                <svg
+                  viewBox="0 0 16 16"
+                  className="size-3.5 fill-none stroke-black stroke-[2.5]"
+                >
+                  <path
+                    d="M3 8.5l3 3 7-7"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              )}
+            </button>
+            <p className="text-sm text-gray-300">
+              I have read and agree to the{" "}
+              <button
+                type="button"
+                onClick={() => setTermsOpen(true)}
+                className="font-semibold text-amber-500 underline underline-offset-2 hover:text-amber-400"
+              >
+                Terms and Conditions
+              </button>
+              .
+            </p>
+          </div>
+
+          <TermsDialog
+            open={termsOpen}
+            onOpenChange={setTermsOpen}
+            onAgree={() => setAgreedToTerms(true)}
+          />
+
+          <div className="mt-8 flex gap-3">
+            <button
+              onClick={() => navigate("/booking/details")}
+              className="flex-1 rounded-full border border-white/20 py-4 text-base font-semibold text-white transition-colors hover:bg-white/5"
+            >
+              Back
+            </button>
+            <button
+              onClick={handleSubmit}
+              disabled={
+                submitting || !state.agreedToTerms || !state.paymentMethod
+              }
+              className="flex flex-[2] items-center justify-center gap-2 rounded-full bg-amber-500 py-4 text-base font-bold text-black transition-all hover:bg-amber-400 hover:shadow-[0_0_28px_rgba(245,158,11,0.35)] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+            >
+              {submitting ? (
+                <>
+                  <span className="size-4 animate-spin rounded-full border-2 border-black/30 border-t-black" />
+                  Submitting…
+                </>
+              ) : (
+                <>
+                  <Sparkles className="size-4" />
+                  Request Booking
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

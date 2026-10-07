@@ -105,7 +105,7 @@ export function AboutSection() {
             <p className="text-xs font-semibold tracking-widest text-amber-500 uppercase">
               {active.eyebrow}
             </p>
-            <h3 className="mt-4 whitespace-pre-line text-3xl font-bold leading-tight sm:text-4xl">
+            <h3 className="mt-2 whitespace-pre-line text-3xl font-bold leading-tight sm:text-2xl">
               {active.heading}
             </h3>
             <p className="mt-6 max-w-xl whitespace-pre-line text-gray-400 leading-relaxed">
