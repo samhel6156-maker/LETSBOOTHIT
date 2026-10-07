@@ -52,6 +52,8 @@ const PAYMENT_METHODS = [
   { value: "landbank", label: "Landbank", icon: Landmark },
 ];
 
+const PROMO_PACKAGES = ["package_8", "package_9", "package_11"];
+
 function InfoRow({
   icon,
   label,
@@ -159,7 +161,9 @@ export default function ReviewPage() {
     state.boothType === "premium" ? "Premium Booth" : "Classic Booth";
 
   const totalHours = parseInt(state.duration, 10) || 0;
-  const endTime = addHoursToTime(state.startTime, totalHours);
+  const promoBonusHour = PROMO_PACKAGES.includes(pkg.value) ? 1 : 0;
+  const displayHours = totalHours + promoBonusHour;
+  const endTime = addHoursToTime(state.startTime, displayHours);
   const baseHours = getBaseHours(pkg.value);
   const durationPrice = getDurationPrice(pkg.value, state.duration);
 
@@ -301,7 +305,10 @@ export default function ReviewPage() {
               )}
               <div className="mt-2 flex items-center justify-between">
                 <span className="text-sm text-gray-400">
-                  {totalHours} Hours Session Duration
+                  {displayHours} Hours Session Duration
+                  {promoBonusHour > 0 && (
+                    <span className="ml-1 text-amber-500">(+1 hr promo)</span>
+                  )}
                 </span>
                 <span className="text-sm text-gray-300">
                   {totalHours === baseHours

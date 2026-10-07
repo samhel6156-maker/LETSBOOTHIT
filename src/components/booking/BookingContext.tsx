@@ -57,21 +57,21 @@ const BookingContext = createContext<BookingContextType | null>(null);
 // ---- Pricing (shared — imported by PackageDetailPage.tsx and ReviewPage.tsx too) ----
 
 export const DURATION_PRICES: Record<string, Record<string, number>> = {
-  package_1: { "2h": 0, "3h": 1000, "4h": 2000 },
-  package_2: { "2h": 0, "3h": 1500, "4h": 3000 },
-  package_3: { "2h": 0, "3h": 1500, "4h": 3000 },
-  package_4: { "2h": 0, "3h": 1500, "4h": 3000 },
-  package_5: { "2h": 0, "3h": 1500, "4h": 3000 },
-  package_6: { "2h": 0, "3h": 1500, "4h": 3000 },
-  package_7: { "2h": 0, "3h": 1500, "4h": 3000 },
-  package_8: { "2h": 0, "3h": 1500, "4h": 3000 },
-  package_9: { "2h": 0, "3h": 1500, "4h": 3000 },
-  package_10: { "2h": 0, "3h": 1500, "4h": 3000 },
-  package_11: { "2h": 0, "3h": 1500, "4h": 3000 },
-  package_12: { "2h": 0, "3h": 1500, "4h": 3000 },
+  package_1: { "2h": 0, "3h": 1000, "4h": 2000, "5h": 3000, "6h": 4000 },
+  package_2: { "2h": 0, "3h": 1500, "4h": 3000, "5h": 4500, "6h": 6000 },
+  package_3: { "2h": 0, "3h": 1500, "4h": 3000, "5h": 4500, "6h": 6000 },
+  package_4: { "2h": 0, "3h": 1500, "4h": 3000, "5h": 4500, "6h": 6000 },
+  package_5: { "2h": 0, "3h": 1500, "4h": 3000, "5h": 4500, "6h": 6000 },
+  package_6: { "2h": 0, "3h": 1500, "4h": 3000, "5h": 4500, "6h": 6000 },
+  package_7: { "2h": 0, "3h": 1500, "4h": 3000, "5h": 4500, "6h": 6000 },
+  package_8: { "2h": 0, "3h": 1500, "4h": 3000, "5h": 4500, "6h": 6000 },
+  package_9: { "2h": 0, "3h": 1500, "4h": 3000, "5h": 4500, "6h": 6000 },
+  package_10: { "2h": 0, "3h": 1500, "4h": 3000, "5h": 4500, "6h": 6000 },
+  package_11: { "2h": 0, "3h": 1500, "4h": 3000, "5h": 4500, "6h": 6000 },
+  package_12: { "2h": 0, "3h": 1500, "4h": 3000, "5h": 4500, "6h": 6000 },
 };
 
-export const THREE_HOUR_BASE_PACKAGES = ["package_9"];
+export const THREE_HOUR_BASE_PACKAGES: string[] = [];
 
 export function getBaseHours(packageId: string | null | undefined): number {
   return packageId && THREE_HOUR_BASE_PACKAGES.includes(packageId) ? 3 : 2;
