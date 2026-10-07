@@ -65,7 +65,7 @@ export const DURATION_PRICES: Record<string, Record<string, number>> = {
   package_6: { "2h": 0, "3h": 1500, "4h": 3000 },
   package_7: { "2h": 0, "3h": 1500, "4h": 3000 },
   package_8: { "2h": 0, "3h": 1500, "4h": 3000 },
-  package_9: { "3h": 0, "4h": 1500, "5h": 3000 },
+  package_9: { "2h": 0, "3h": 1500, "4h": 3000 },
   package_10: { "2h": 0, "3h": 1500, "4h": 3000 },
   package_11: { "2h": 0, "3h": 1500, "4h": 3000 },
   package_12: { "2h": 0, "3h": 1500, "4h": 3000 },

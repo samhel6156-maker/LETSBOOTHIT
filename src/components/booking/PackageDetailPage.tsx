@@ -153,7 +153,12 @@ const NO_BOOTH_SELECTION = [
 
 // 360° Video Booth, Magazine Booth, Photoman only — Mirror Booth and
 // High Angle still offer a backdrop choice.
-const NO_BACKDROP_SELECTION = ["package_9", "package_11", "package_12"];
+const NO_BACKDROP_SELECTION = [
+  "package_9",
+  "package_10",
+  "package_11",
+  "package_12",
+];
 
 // Strip Magnetic and Strip Standee — offer an optional dedication/message add-on.
 const DEDICATION_PACKAGES = ["package_3", "package_4"];
