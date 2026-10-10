@@ -317,7 +317,7 @@ export default function EventDetailsPage() {
                 onClick={handleNext}
                 className="flex-1 rounded-full bg-amber-500 py-4 text-base font-bold text-black transition-all hover:bg-amber-400 hover:shadow-[0_0_28px_rgba(245,158,11,0.35)]"
               >
-                Review Booking
+                Continue to Contact Details
               </button>
             </div>
           </div>
