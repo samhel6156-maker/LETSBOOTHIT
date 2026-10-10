@@ -2,7 +2,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useBooking } from "./BookingContext";
 import { StepProgress } from "./StepProgress";
 import { PACKAGES } from "./BookingPage";
@@ -52,12 +51,6 @@ export default function ConfirmationPage() {
     <div className="min-h-screen bg-[#1b1b18] pb-16">
       <div className="sticky top-0 z-20 border-b border-white/8 bg-[#1b1b18]/95 backdrop-blur-sm">
         <div className="mx-auto flex h-14 max-w-[1152px] items-center justify-between px-6">
-          <button
-            onClick={() => navigate("/")}
-            className="flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-white"
-          >
-            <span className="hidden sm:inline">Back to Home</span>
-          </button>
           <p className="font-serif text-lg italic font-bold text-white">
             Let&apos;s <span className="text-amber-500">Booth</span> It
           </p>
@@ -171,7 +164,7 @@ export default function ConfirmationPage() {
           {/* Actions */}
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <button
-              onClick={() => navigate("/booking/details")}
+              onClick={() => navigate("/")}
               className="flex-1 rounded-full border border-white/20 py-4 text-base font-semibold text-white transition-colors hover:bg-white/5"
             >
               Back to Home

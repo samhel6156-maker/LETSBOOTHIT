@@ -1,7 +1,7 @@
 // src/components/booking/EventDetailsPage.tsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, CalendarDays, Clock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -24,6 +24,59 @@ const EVENT_TYPES = [
 function FieldError({ show, message }: { show: boolean; message: string }) {
   if (!show) return null;
   return <p className="mt-1.5 text-xs text-red-400">{message}</p>;
+}
+
+function formatDateDisplay(value: string): string {
+  if (!value) return "";
+  const d = new Date(`${value}T00:00:00`);
+  return d.toLocaleDateString("en-PH", {
+    weekday: "short",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function formatTimeDisplay(value: string): string {
+  if (!value) return "";
+  const [h, m] = value.split(":").map(Number);
+  const period = h >= 12 ? "PM" : "AM";
+  const displayH = h % 12 === 0 ? 12 : h % 12;
+  return `${displayH}:${String(m).padStart(2, "0")} ${period}`;
+}
+
+function PickerTile({
+  icon,
+  display,
+  placeholder,
+  hasError,
+  children,
+}: {
+  icon: React.ReactNode;
+  display: string;
+  placeholder: string;
+  hasError: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className={cn(
+        "relative flex h-12 items-center justify-between gap-3 rounded-xl border bg-[#2a2926] px-4 transition-colors hover:border-white/25 focus-within:border-amber-500/50 focus-within:ring-2 focus-within:ring-amber-500/30",
+        hasError ? "border-red-500/50" : "border-white/10",
+      )}
+    >
+      <p
+        className={cn(
+          "min-w-0 flex-1 truncate text-sm",
+          display ? "text-white" : "text-gray-500",
+        )}
+      >
+        {display || placeholder}
+      </p>
+      <span className="shrink-0 text-gray-400">{icon}</span>
+      {children}
+    </div>
+  );
 }
 
 function getTodayLocal(): string {
@@ -132,16 +185,24 @@ export default function EventDetailsPage() {
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <Label htmlFor="event-date">Event Date *</Label>
-                  <Input
-                    id="event-date"
-                    type="date"
-                    value={state.eventDate}
-                    min={today}
-                    onChange={(e) =>
-                      updateEventDetails({ eventDate: e.target.value })
-                    }
-                    className={cn("cursor-pointer", inputError("eventDate"))}
-                  />
+                  <PickerTile
+                    icon={<CalendarDays className="size-4" />}
+                    display={formatDateDisplay(state.eventDate)}
+                    placeholder="Select a date"
+                    hasError={attempted && !!errors.eventDate}
+                  >
+                    <input
+                      id="event-date"
+                      type="date"
+                      value={state.eventDate}
+                      min={today}
+                      onChange={(e) =>
+                        updateEventDetails({ eventDate: e.target.value })
+                      }
+                      onClick={(e) => e.currentTarget.showPicker?.()}
+                      className="absolute inset-0 h-full w-full cursor-pointer opacity-0 [color-scheme:dark]"
+                    />
+                  </PickerTile>
                   <FieldError
                     show={attempted && !!errors.eventDate}
                     message={errors.eventDate}
@@ -150,15 +211,23 @@ export default function EventDetailsPage() {
 
                 <div>
                   <Label htmlFor="start-time">Start Time *</Label>
-                  <Input
-                    id="start-time"
-                    type="time"
-                    value={state.startTime}
-                    onChange={(e) =>
-                      updateEventDetails({ startTime: e.target.value })
-                    }
-                    className={cn("cursor-pointer", inputError("startTime"))}
-                  />
+                  <PickerTile
+                    icon={<Clock className="size-4" />}
+                    display={formatTimeDisplay(state.startTime)}
+                    placeholder="Select a time"
+                    hasError={attempted && !!errors.startTime}
+                  >
+                    <input
+                      id="start-time"
+                      type="time"
+                      value={state.startTime}
+                      onChange={(e) =>
+                        updateEventDetails({ startTime: e.target.value })
+                      }
+                      onClick={(e) => e.currentTarget.showPicker?.()}
+                      className="absolute inset-0 h-full w-full cursor-pointer opacity-0 [color-scheme:dark]"
+                    />
+                  </PickerTile>
                   <FieldError
                     show={attempted && !!errors.startTime}
                     message={errors.startTime}
